@@ -402,6 +402,10 @@ Game.makeField = function(sides, t) {
 						if(typeof e === 'undefined'){
 							// console.log("cand << ", near);
 							candidate.push(near.slice());
+<<<<<<< HEAD
+=======
+							// return show_locatable_chars(near);
+>>>>>>> 20f962c9674eb715a7f3092709cca5e8445590de
 							var res = show_locatable_chars(near);
 							console.log("give you ", typeof res);
 							// console.log("res: ", res);
