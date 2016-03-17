@@ -119,18 +119,6 @@ Game.makeField = function(sides, t) {
 	var create = function (ansO, v) {
 		var f = {};
 		var splitext = t.split('');
-		// var chars = (function () {
-		// 	var q = splitext.slice();
-		// 	var a = new Array();
-		// 	var i;
-		// 	while (q.length) {
-		// 		i = q.pop();
-		// 		if (!q.find(i)) {
-		// 			a.push(i);
-		// 		}
-		// 	}
-		// 	return a;
-		// })();
 		var choice = (function (len) {
 			var ans = [];
 			var list = [0, -1, +1];
@@ -157,14 +145,23 @@ Game.makeField = function(sides, t) {
 		})(dimention);
 		var temporary_fields = [];
 		var axes = function (array, index, substitune) {
+			// if (arguments[3]) {
+				// console.log("in axes: ", Object.keys(array).join(' '));
+				// console.log("f (in) : ", Object.keys(f).join(' '));
+			// }
 			if (isexist(index)) {
 				var strindex = coordinate_to_string(index);
+				// console.log("strindex: ", strindex);
 				if (arguments.length >= 2) {
 					var isfunc = (typeof substitune === 'function');
-					// console.log("これが: ", array[strindex]);
+					// if (arguments[3]) {
+					// 	console.log("originl: ", array[strindex]);
+					// }
 					array[strindex] = (isfunc ? substitune(array[strindex]) : substitune);
-					// console.log("こうじゃ: ", array[strindex]);
 				}
+				// if (arguments[3]) {
+				// 	console.log("f[", index, "] << ", array[strindex]);
+				// }
 				return array[strindex];
 			} else {
 				return void 0;
@@ -406,19 +403,21 @@ Game.makeField = function(sides, t) {
 							// console.log("cand << ", near);
 							candidate.push(near.slice());
 							// return show_locatable_chars(near);
-							var res = show_locatable_chars(near); // debug
-							console.log("typeof res: ", typeof res); // debug
+							var res = show_locatable_chars(near);
+							console.log("give you ", typeof res);
 							// console.log("res: ", res);
-							return copy_field(res); // debug::changed
+							return copy_field(res);
 						} else {
 							return e;
 						}
-					});
-					console.log("f[", near, "]: ", axes(f, near));
+					}, true);
+					// console.log("f (out): ", Object.keys(f).join(' '));
+					console.log("f[", near, "] >> ", axes(f, near/*, function (e){return e}/*, true*/));
+					console.log();
 				});
 			};
 			fill_target();
-			console.log("cookie☆: ", Object.keys(f));
+			// console.log("cookie☆: ", Object.keys(f));
 			var i = s;
 			while (--i) {
 				wrap_tile(coordinate);
