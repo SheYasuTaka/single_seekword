@@ -3,7 +3,17 @@ var Game = {},
 		return document.getElementById(s);
 	};
 
-Game.makeField = function(sides, t) {
+var forDebug = {};
+
+forDebug.showAnythingFromObject = function (object){
+	var str = Object.keys(object).filter(function (e){
+		return typeof object[e] !== 'undefined';
+	});
+	console.log(str.join(', '));
+};
+
+
+Game.makeField = function (sides, t) {
 	// The core function
 	var s = t.length;
 	var dimention = sides.length;
@@ -161,6 +171,10 @@ Game.makeField = function(sides, t) {
 				}
 				// if (arguments[3]) {
 				// 	console.log("f[", index, "] << ", array[strindex]);
+				// }
+				// if (arguments[3]) {
+				// 	console.log("inax");
+				// 	forDebug.showAnythingFromObject(array);
 				// }
 				return array[strindex];
 			} else {
@@ -402,10 +416,7 @@ Game.makeField = function(sides, t) {
 						if(typeof e === 'undefined'){
 							// console.log("cand << ", near);
 							candidate.push(near.slice());
-<<<<<<< HEAD
-=======
 							// return show_locatable_chars(near);
->>>>>>> 20f962c9674eb715a7f3092709cca5e8445590de
 							var res = show_locatable_chars(near);
 							console.log("give you ", typeof res);
 							// console.log("res: ", res);
@@ -416,6 +427,8 @@ Game.makeField = function(sides, t) {
 					}, true);
 					// console.log("f (out): ", Object.keys(f).join(' '));
 					console.log("f[", near, "] >> ", axes(f, near/*, function (e){return e}/*, true*/));
+					// console.log("outax");
+					// forDebug.showAnythingFromObject(f);
 					console.log();
 				});
 			};
