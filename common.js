@@ -65,7 +65,7 @@ Game.makeField = function (sides, t) {
 	};
 	var rev_rand = function (S, s, seed) {
 		var range = 0;
-		var sides = S.slice(0);
+		var sides = S.slice();
 		for (;;) {
 			var whole = sides.reduce(function (sum, e) {
 				return sum * e;
@@ -97,18 +97,18 @@ Game.makeField = function (sides, t) {
 			}
 		};
 		var steam = function () {
-			var MinIndex = Infinity;
-			var redunF = true;
+			var minIndex = Infinity;
+			var redunFlag = true;
 			index.forEach(function (e, i) {
-				MinIndex = Math.min(MinIndex, e, S[i] - e - 1);
+				minIndex = Math.min(minIndex, e, S[i] - e - 1);
 				if (e < S[i] - s || e >= s) {
-					redunF = false;
+					redunFlag = false;
 				}
 			});
-			if (redunF) {
+			if (redunFlag) {
 				return 0;
 			} else {
-				return ++MinIndex;
+				return ++minIndex;
 			}
 		};
 		for (var pin = Math.floor(seed * range); pin > 0; incr()) {
@@ -162,7 +162,7 @@ Game.makeField = function (sides, t) {
 			if (isexist(index)) {
 				var strindex = coordinate_to_string(index);
 				// console.log("strindex: ", strindex);
-				if (arguments.length >= 2) {
+				if (arguments.length >= 3) {
 					var isfunc = (typeof substitune === 'function');
 					// if (arguments[3]) {
 					// 	console.log("originl: ", array[strindex]);
@@ -170,7 +170,8 @@ Game.makeField = function (sides, t) {
 					array[strindex] = (isfunc ? substitune(array[strindex]) : substitune);
 				}
 				// if (arguments[3]) {
-				// 	console.log("f[", index, "] << ", array[strindex]);
+				// 	console.log("f[", index, "] << ", typeof array[strindex]);
+				// 	console.log("Bool: ", !!array[strindex]);
 				// }
 				// if (arguments[3]) {
 				// 	console.log("inax");
@@ -412,28 +413,28 @@ Game.makeField = function (sides, t) {
 					var near = add_list(point, e);
 					axes(f, near, function (e) {
 						// console.log("near: ", near, ", e: ", e);
-						console.log("typeof e: ", typeof e);
+						// console.log("typeof e: ", typeof e);
 						if(typeof e === 'undefined'){
 							// console.log("cand << ", near);
 							candidate.push(near.slice());
 							// return show_locatable_chars(near);
 							var res = show_locatable_chars(near);
-							console.log("give you ", typeof res);
+							// console.log("give you ", typeof res);
 							// console.log("res: ", res);
 							return copy_field(res);
 						} else {
 							return e;
 						}
 					}, true);
+					// console.log("returned: " ,ret);
 					// console.log("f (out): ", Object.keys(f).join(' '));
-					console.log("f[", near, "] >> ", axes(f, near/*, function (e){return e}/*, true*/));
+					// console.log("f[", near, "] >> ", axes(f, near/*, function (e){return e}/*, true*/));
 					// console.log("outax");
 					// forDebug.showAnythingFromObject(f);
-					console.log();
+					// console.log();
 				});
 			};
 			fill_target();
-			// console.log("cookie☆: ", Object.keys(f));
 			var i = s;
 			while (--i) {
 				wrap_tile(coordinate);
