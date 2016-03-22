@@ -5,6 +5,10 @@ var Game = {},
 
 var forDebug = {};
 
+var charReplace = function (str, index, char){
+	return str.replace(new RegExp('(^.{' + index + '}).'), '$1' + char);
+};
+
 forDebug.showAnythingFromObject = function (object){
 	var str = Object.keys(object).filter(function (e){
 		return typeof object[e] !== 'undefined';
@@ -12,6 +16,39 @@ forDebug.showAnythingFromObject = function (object){
 	console.log(str.join(', '));
 };
 
+forDebug.show2Dmap = function (map, h, w){
+	var str = Array(h).join('_').split('_').map(function (){
+		return Array(w).join('_').split('_').map(function (){return '-'});
+	});
+	map.forEach(function (e){
+		str[e[0]][e[1]] = '#';
+	});
+	console.log(str.map(function (e){return e.join('')}).join('\n'));
+};
+
+forDebug.show2DrealMap = function (f, h, w){
+	var ctos = function (c) {
+		return c.join('_');
+	};
+	for (var i = 0; i < h; i++){
+		var str = '';
+		for (var j = 0; j < w; j++){
+			switch (typeof f[ctos([i,j])]){
+			case 'undefined':
+				str += '.';
+				break;
+			case 'string':
+				str += '$';
+				break;
+			case 'object':
+				str += '#';
+				break;
+			}
+		}
+		console.log(str);
+	}
+	console.log();
+};
 
 Game.makeField = function (sides, t) {
 	// The core function
@@ -46,7 +83,7 @@ Game.makeField = function (sides, t) {
 	var copy_field = function (x) {
 		// for an Object, an Array, or a PrimitiveValue.
 		var initial;
-		var is_obj = [Object, Array].some(function (Constructor) {
+		var is_obj = [Array, Object].some(function (Constructor) {
 			if (x instanceof Constructor) {
 				initial = new Constructor();
 				return true;
@@ -187,6 +224,7 @@ Game.makeField = function (sides, t) {
 			var is_collapse = candidate.some(function (position){
 				var count = -1, mins = [];
 				var data = axes(f, position);
+				console.log("pos: ", position, "data: ", typeof data);
 				var wide_min = Infinity;
 				Object.keys(data).forEach(function (can_be_taken){
 					var eachar = data[can_be_taken];
@@ -204,7 +242,7 @@ Game.makeField = function (sides, t) {
 							}
 						});
 					});
-					mins.push([[position, can_be_taken], narrow_min]);
+					mins.push([[position.slice(), can_be_taken], narrow_min]);
 					if (narrow_min < wide_min) {
 						wide_min = narrow_min;
 					}
@@ -228,6 +266,7 @@ Game.makeField = function (sides, t) {
 				lids.sort(function (a, b){
 					return a[1] - b[1];
 				});
+				// console.log("lids: ", lids);
 				return lids.map(function (e){
 					return e[0];
 				});
@@ -320,7 +359,6 @@ Game.makeField = function (sides, t) {
 				drtn,
 				movements
 			) {
-				f = copy_field(f);
 				var positive = coordinate_to_string(drtn);
 				var negative = coordinate_to_string(drtn.map(function (e){
 					return -e;
@@ -365,13 +403,32 @@ Game.makeField = function (sides, t) {
 				});
 				return ranges;
 			};
+			var reject_once = function (arr, coor){
+				var inspector = function (x){
+					return x.every(function (elem, index){
+						return elem === coor[index];
+					});
+				};
+				return arr.some(function (e,i){
+					return inspector(e) && arr.splice(i,1);
+				});
+			};
+			f = copy_field(f);
+			f.cand[1].shift();
+			reject_once(f.cand[0], diff);
 			axes(f.field, diff, char);
+			console.log("diff: ", diff);
 			choice.forEach(function (drtn){
 				var changed = diff.slice();
 				var movements = 0;
+				// console.log("first: ", changed);
 				while (++movements < s) {
+					// console.log("mov: ", movements, s);
+					// console.log("drtn: ", drtn);
 					changed = add_list(changed, drtn);
+					// console.log("coor: ", changed);
 					axes(f.field, changed, function (e){
+						// console.log("e: ", e);
 						switch(typeof e){
 						case 'string':
 							return e;
@@ -388,7 +445,11 @@ Game.makeField = function (sides, t) {
 						}
 					});
 				}
+				// console.log();
 			});
+			console.log("cand[0]: ", f.cand[0].join(' '));
+			forDebug.show2Dmap(f.cand[0], sides[0], sides[1]);
+			forDebug.show2DrealMap(f.field, sides[0], sides[1]);
 			f.cand[1] = show_candidates(f.cand[0]);
 			if (f.cand[1]) {
 				f.quant--;
@@ -411,12 +472,17 @@ Game.makeField = function (sides, t) {
 			var wrap_tile = function (point) {
 				choice.forEach(function (e) {
 					var near = add_list(point, e);
+					console.log("point: ", point, ", e:", e,
+						", near: ",near);
 					axes(f, near, function (e) {
 						// console.log("near: ", near, ", e: ", e);
 						// console.log("typeof e: ", typeof e);
 						if(typeof e === 'undefined'){
 							// console.log("cand << ", near);
 							candidate.push(near.slice());
+							forDebug.show2Dmap(candidate, sides[0], sides[1]);
+							forDebug.show2DrealMap(f, sides[0], sides[1]);
+							console.log();
 							// return show_locatable_chars(near);
 							var res = show_locatable_chars(near);
 							// console.log("give you ", typeof res);
@@ -428,7 +494,6 @@ Game.makeField = function (sides, t) {
 					}, true);
 					// console.log("returned: " ,ret);
 					// console.log("f (out): ", Object.keys(f).join(' '));
-					// console.log("f[", near, "] >> ", axes(f, near/*, function (e){return e}/*, true*/));
 					// console.log("outax");
 					// forDebug.showAnythingFromObject(f);
 					// console.log();
@@ -436,11 +501,14 @@ Game.makeField = function (sides, t) {
 			};
 			fill_target();
 			var i = s;
-			while (--i) {
+			while (i--) {
 				wrap_tile(coordinate);
 				coordinate = add_list(coordinate, v);
 			}
-			console.log(candidate);
+			console.log("cand: ", candidate.join(' '));
+			forDebug.show2Dmap(candidate, sides[0], sides[1]);
+			forDebug.show2DrealMap(f, sides[0], sides[1]);
+			console.log("ansO: ", ansO, ", v: ", v);
 			return [candidate, show_candidates(candidate)];
 		};
 		var candidate = wrap_first_map();
@@ -448,7 +516,7 @@ Game.makeField = function (sides, t) {
 			return prev * curr;
 		});
 		quantity -= s;
-		console.log(candidate);
+		console.log("Q.E.D. ", quantity);
 		temporary_fields.unshift({
 			field: f,
 			cand: candidate,
@@ -456,12 +524,18 @@ Game.makeField = function (sides, t) {
 		});
 		// loop
 		while (temporary_fields[0].quant) {
+			console.log("top: ", temporary_fields[0].quant);
 			var cand = temporary_fields[0].cand[1];
 			if (cand.length) {
-				var data = cand.shift();
-				var next = update_chars_data(temporary_fields[0], data[0], data[1]);
-				if (next) {
-					temporary_fields.unshift(next);
+				var data = cand[0].shift();
+				if (!data) {
+					cand.unshift();
+				} else {
+					console.log("data: ", data);
+					var next = update_chars_data(temporary_fields[0], data[0], data[1]);
+					if (next) {
+						temporary_fields.unshift(next);
+					}
 				}
 			} else {
 				temporary_fields.shift();
@@ -524,11 +598,12 @@ Game.makeField = function (sides, t) {
 
 function view_result (sides, t){
 	var result = Game.makeField(sides, t);
-	if (result){
-		console.log(result.map(function (e){Array.prototype.join.apply(e)}).join('\n'));
-	} else {
-		console.log("failed to make field!");
-	}
+	// if (result){
+	// 	console.log(result.map(function (e){Array.prototype.join.apply(e)}).join('\n'));
+	// } else {
+	// 	console.log("failed to make field!");
+	// }
+	// console.log(result);
 }
 
 view_result([16, 16], "flandre"); // debug
