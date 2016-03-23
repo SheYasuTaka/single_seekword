@@ -24,6 +24,7 @@ forDebug.show2Dmap = function (map, h, w){
 		str[e[0]][e[1]] = '#';
 	});
 	console.log(str.map(function (e){return e.join('')}).join('\n'));
+	console.log();
 };
 
 forDebug.show2DrealMap = function (f, h, w){
@@ -38,10 +39,10 @@ forDebug.show2DrealMap = function (f, h, w){
 				str += '.';
 				break;
 			case 'string':
-				str += '$';
+				str += '#';
 				break;
 			case 'object':
-				str += '#';
+				str += '=';
 				break;
 			}
 		}
@@ -219,12 +220,12 @@ Game.makeField = function (sides, t) {
 				return void 0;
 			}
 		};
-		var show_candidates = function (candidate) {
+		var show_candidates = function (f, candidate) {
 			var lids = [];
 			var is_collapse = candidate.some(function (position){
 				var count = -1, mins = [];
 				var data = axes(f, position);
-				console.log("pos: ", position, "data: ", typeof data);
+				// console.log("pos: ", position, "data: ", typeof data);
 				var wide_min = Infinity;
 				Object.keys(data).forEach(function (can_be_taken){
 					var eachar = data[can_be_taken];
@@ -450,7 +451,7 @@ Game.makeField = function (sides, t) {
 			console.log("cand[0]: ", f.cand[0].join(' '));
 			forDebug.show2Dmap(f.cand[0], sides[0], sides[1]);
 			forDebug.show2DrealMap(f.field, sides[0], sides[1]);
-			f.cand[1] = show_candidates(f.cand[0]);
+			f.cand[1] = show_candidates(f.field, f.cand[0]);
 			if (f.cand[1]) {
 				f.quant--;
 				return f;
@@ -509,7 +510,7 @@ Game.makeField = function (sides, t) {
 			forDebug.show2Dmap(candidate, sides[0], sides[1]);
 			forDebug.show2DrealMap(f, sides[0], sides[1]);
 			console.log("ansO: ", ansO, ", v: ", v);
-			return [candidate, show_candidates(candidate)];
+			return [candidate, show_candidates(f, candidate)];
 		};
 		var candidate = wrap_first_map();
 		var quantity = sides.reduce(function (prev, curr){
