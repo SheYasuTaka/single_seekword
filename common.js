@@ -279,7 +279,7 @@ Game.makeField = function (sides, t, seeds) {
 							}
 						});
 					});
-					mins.push([[position.slice(), can_be_taken], narrow_min]);
+					mins.push([can_be_taken, narrow_min]);
 					if (narrow_min < wide_min) {
 						wide_min = narrow_min;
 					}
@@ -297,7 +297,7 @@ Game.makeField = function (sides, t, seeds) {
 				// 	return e[0];
 				// });
 				var parameter = count * wide_min;
-				lids.push([mins, parameter]);
+				lids.push([[position.slice(), mins], parameter]);
 				return false;
 			});
 			if (is_collapse) {
@@ -568,6 +568,7 @@ Game.makeField = function (sides, t, seeds) {
 					return inspector(e) && arr.splice(i,1);
 				});
 			};
+			// console.time("bef-cf");
 			var seed = 1.5 - Math.sqrt(rand_with_seeds()[0]);
 			var selector = temporary_fields[0].cand[1];
 			var len = selector.length;
@@ -588,10 +589,11 @@ Game.makeField = function (sides, t, seeds) {
 			seed = 1.5 - Math.sqrt(rand_with_seeds()[0]);
 			var dselector = selector[i][0];
 			var data;
-			len = dselector.length
+			len = dselector[1].length;
 			i = 0;
 			for (;;) {
-				seed -= (1 / dselector[i][1]);
+				console.log(seed, i);
+				seed -= (1 / dselector[1][i][1]);
 				if (seed <= 0) {
 					break;
 				}
@@ -600,20 +602,29 @@ Game.makeField = function (sides, t, seeds) {
 					i = 0;
 				}
 			}
+			console.log(dselector);
 			// console.log(dselector[i][0]);
-			data = dselector.splice(i, 1)[0][0];
+			data = [dselector[0].slice(), dselector[1].splice(i, 1)[0][0]];
+			console.log(data);
 			if (!dselector.length) {
 				selector.splice(i, 1);
 			}
+			// console.timeEnd("bef-cf");
+			// console.time("cf");
 			var field = copy_field(temporary_fields[0]);
+			// console.timeEnd("cf");
+			// console.time("rj");
 			reject_once(field.cand[0], data[0]);
+			// console.timeEnd("rj");
 			// console.log(data);
+			// console.time("aft-rj");
 			axes(field.field, data[0], data[1]);
 			if (data[1]) {
 				temporary_fields.unshift(field);
 			} else {
 				temporary_fields[0] = field;
 			}
+			// console.timeEnd("aft-rj");
 			return data;
 		};
 		var candidate = wrap_first_map();
@@ -638,7 +649,9 @@ Game.makeField = function (sides, t, seeds) {
 				// } else {
 					// console.log("data: ", data);
 					// var is_more_than1 = cand[0][1];
+					console.time("snf");
 					var data = set_next_field();
+					console.timeEnd("snf");
 					console.time("ucd");
 					var next = update_chars_data(data[0], data[1]);
 					console.timeEnd("ucd");
@@ -716,8 +729,8 @@ function view_result (sides, t){
 	forDebug.show2DrealMapStr(result, sides);
 }
 
-view_result([16, 16], "flandre");
+// view_result([16, 16], "flandre");
 view_result([16, 16], "remilia");
-view_result([ 8,  4], "scarlet");
-view_result([ 7, 10], "onion"  );
+// view_result([ 8,  4], "scarlet");
+// view_result([ 7, 10], "onion"  );
 
