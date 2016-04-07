@@ -4,73 +4,73 @@ var Game = {},
 		return document.getElementById(s);
 	};
 
-var forDebug = {};
+// var forDebug = {};
 
-var charReplace = function (str, index, char){
-	return str.replace(new RegExp('(^.{' + index + '}).'), '$1' + char);
-};
+// var charReplace = function (str, index, char){
+// 	return str.replace(new RegExp('(^.{' + index + '}).'), '$1' + char);
+// };
 
-forDebug.showAnythingFromObject = function (object){
-	var str = Object.keys(object).filter(function (e){
-		return typeof object[e] !== 'undefined';
-	});
-	console.log(str.join(', '));
-};
+// forDebug.showAnythingFromObject = function (object){
+// 	var str = Object.keys(object).filter(function (e){
+// 		return typeof object[e] !== 'undefined';
+// 	});
+// 	console.log(str.join(', '));
+// };
 
-forDebug.show2Dmap = function (map, h, w){
-	var str = Array(h).join('_').split('_').map(function (){
-		return Array(w).join('_').split('_').map(function (){return '-'});
-	});
-	map.forEach(function (e){
-		str[e[0]][e[1]] = '#';
-	});
-	console.log(str.map(function (e){return e.join('')}).join('\n'));
-	console.log();
-};
+// forDebug.show2Dmap = function (map, h, w){
+// 	var str = Array(h).join('_').split('_').map(function (){
+// 		return Array(w).join('_').split('_').map(function (){return '-'});
+// 	});
+// 	map.forEach(function (e){
+// 		str[e[0]][e[1]] = '#';
+// 	});
+// 	console.log(str.map(function (e){return e.join('')}).join('\n'));
+// 	console.log();
+// };
 
-forDebug.show2DrealMapStr = function (result, sides){
-	console.log();
-	if (!result) {
-		console.log("=== impossible ===");
-	} else {
-		if (sides.length !== 2) {
-			console.log("=== cannot ouput ===");
-		} else {
-			for (var i = 0; i < sides[0]; i++){
-				var str = '';
-				for (var j = 0; j < sides[1]; j++){
-					str += result[i + '_' + j];
-				}
-				console.log(str);
-			}
-		}
-	}
-	console.log();
-};
+// forDebug.show2DrealMapStr = function (result, sides){
+// 	console.log();
+// 	if (!result) {
+// 		console.log("=== impossible ===");
+// 	} else {
+// 		if (sides.length !== 2) {
+// 			console.log("=== cannot ouput ===");
+// 		} else {
+// 			for (var i = 0; i < sides[0]; i++){
+// 				var str = '';
+// 				for (var j = 0; j < sides[1]; j++){
+// 					str += result[i + '_' + j];
+// 				}
+// 				console.log(str);
+// 			}
+// 		}
+// 	}
+// 	console.log();
+// };
 
-forDebug.show2DrealMap = function (f, h, w){
-	var ctos = function (c) {
-		return c.join('_');
-	};
-	for (var i = 0; i < h; i++){
-		var str = '';
-		for (var j = 0; j < w; j++){
-			switch (typeof f[ctos([i,j])]){
-			case 'undefined':
-				str += '.';
-				break;
-			case 'string':
-				str += '#';
-				break;
-			case 'object':
-				str += '=';
-				break;
-			}
-		}
-		console.log(str);
-	}
-	console.log();
-};
+// forDebug.show2DrealMap = function (f, h, w){
+// 	var ctos = function (c) {
+// 		return c.join('_');
+// 	};
+// 	for (var i = 0; i < h; i++){
+// 		var str = '';
+// 		for (var j = 0; j < w; j++){
+// 			switch (typeof f[ctos([i,j])]){
+// 			case 'undefined':
+// 				str += '.';
+// 				break;
+// 			case 'string':
+// 				str += '#';
+// 				break;
+// 			case 'object':
+// 				str += '=';
+// 				break;
+// 			}
+// 		}
+// 		console.log(str);
+// 	}
+// 	console.log();
+// };
 
 Game.makeField = function (sides, t, seeds) {
 	// The core function
@@ -687,7 +687,7 @@ Game.makeField = function (sides, t, seeds) {
 		return temporary_fields[0].field;
 	};
 	var ansO = rev_rand(sides, s);
-	console.log(ansO);
+	// console.log(ansO);
 	var pick_vector = function (ansO, sides, s) {
 		//
 		var radixs = [1];
@@ -726,7 +726,7 @@ Game.makeField = function (sides, t, seeds) {
 		var v = vlist.map(function (e, i) {
 			return e[Math.floor(intseed / radixs[i]) % e.length];
 		});
-		console.log(v);
+		// console.log(v);
 		return v;
 	};
 	var v = pick_vector(ansO, sides, s);
@@ -736,23 +736,23 @@ Game.makeField = function (sides, t, seeds) {
 // TODO: コメントつけろ
 // TODO: オーダーおとせ
 
-function view_result (sides, t){
-	console.log("sides: ", sides, ", t: ", t);
-	console.time(   "view_result");
-	var result = Game.makeField(sides, t,
-		(":".repeat(16).split('').map(function (){
-			return Math.random();
-		})));
-	console.timeEnd("view_result");
-	forDebug.show2DrealMapStr(result, sides);
-}
+// function view_result (sides, t){
+// 	console.log("sides: ", sides, ", t: ", t);
+// 	console.time(   "view_result");
+// 	var result = Game.makeField(sides, t,
+// 		(":".repeat(16).split('').map(function (){
+// 			return Math.random();
+// 		})));
+// 	console.timeEnd("view_result");
+// 	forDebug.show2DrealMapStr(result, sides);
+// }
 
 // view_result([16, 16], "flandre");
 // view_result([16, 16], "remilia");
 // view_result([ 8,  4], "scarlet");
 // view_result([ 7, 10], "onion"  );
 
-view_result([16, 16], "escape"); // Accepted,  3383.734ms
-view_result([24, 24], "escape"); // Accepted, 14918.606ms
+// view_result([16, 16], "escape"); // Accepted,  3383.734ms
+// view_result([24, 24], "escape"); // Accepted, 14918.606ms
 
 // view_result([30, 30], "escape"); // Failed (too large object)
