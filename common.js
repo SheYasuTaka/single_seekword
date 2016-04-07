@@ -752,7 +752,7 @@ function view_result (sides, t){
 // view_result([ 8,  4], "scarlet");
 // view_result([ 7, 10], "onion"  );
 
-// view_result([16, 16], "escape");
+view_result([16, 16], "escape"); // Accepted,  3383.734ms
 view_result([24, 24], "escape"); // Accepted, 14918.606ms
 
-// view_result([30, 30], "escape"); // Failed
+// view_result([30, 30], "escape"); // Failed (too large object)
