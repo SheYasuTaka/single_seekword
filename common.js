@@ -117,23 +117,34 @@ Game.makeField = function (sides, t, seeds) {
 	};
 	var copy_field = function (x) {
 		// for an Object, an Array, or a PrimitiveValue.
-		var initial;
-		var is_obj = [Array, Object].some(function (Constructor) {
-			if (x instanceof Constructor) {
-				initial = new Constructor();
-				return true;
-			} else {
-				return false;
-			}
-		});
-		if (is_obj) {
-			Object.keys(x).forEach(function (key) {
-				initial[key] = copy_field(x[key]);
+		var result;
+		try {
+			// console.log("length:");
+			var strfied = JSON.stringify(x);
+			// console.log(strfied.length);
+			// console.log(strfied);
+			result = JSON.parse(strfied);
+			// console.log("=======");
+		} catch(e){
+			var initial;
+			var is_obj = [Array, Object].some(function (Constructor) {
+				if (x instanceof Constructor) {
+					initial = new Constructor();
+					return true;
+				} else {
+					return false;
+				}
 			});
-			return initial;
-		} else {
-			return x;
+			if (is_obj) {
+				Object.keys(x).forEach(function (key) {
+					initial[key] = copy_field(x[key]);
+				});
+				result = initial;
+			} else {
+				result = x;
+			}
 		}
+		return result;
 	};
 	var rev_rand = function (S, s) {
 		var range = 0;
@@ -529,6 +540,7 @@ Game.makeField = function (sides, t, seeds) {
 							var res = show_locatable_chars(near);
 							// console.log("give you ", typeof res);
 							// console.log("res: ", res);
+							// console.log("cf: wrap_tile (543)");
 							return copy_field(res);
 						} else {
 							return e;
@@ -569,7 +581,7 @@ Game.makeField = function (sides, t, seeds) {
 				});
 			};
 			// console.time("bef-cf");
-			var seed = 1.5 - Math.sqrt(rand_with_seeds()[0]);
+			var seed = 1.0 - Math.sqrt(rand_with_seeds()[0]);
 			var selector = temporary_fields[0].cand[1];
 			var len = selector.length;
 			var i = 0;
@@ -586,13 +598,13 @@ Game.makeField = function (sides, t, seeds) {
 				}
 			}
 			// var data = selector[i][0].shift(); // *
-			seed = 1.5 - Math.sqrt(rand_with_seeds()[0]);
+			seed = 1.0 - Math.sqrt(rand_with_seeds()[0]);
 			var dselector = selector[i][0];
 			var data;
 			len = dselector[1].length;
 			i = 0;
 			for (;;) {
-				console.log(seed, i);
+				// console.log(seed, i);
 				seed -= (1 / dselector[1][i][1]);
 				if (seed <= 0) {
 					break;
@@ -602,16 +614,21 @@ Game.makeField = function (sides, t, seeds) {
 					i = 0;
 				}
 			}
-			console.log(dselector);
+			// console.log(dselector);
 			// console.log(dselector[i][0]);
 			data = [dselector[0].slice(), dselector[1].splice(i, 1)[0][0]];
-			console.log(data);
+			// console.log(data);
 			if (!dselector.length) {
 				selector.splice(i, 1);
 			}
 			// console.timeEnd("bef-cf");
 			// console.time("cf");
-			var field = copy_field(temporary_fields[0]);
+			// console.log("cf: snf(626)");
+			var field = {
+				field: copy_field(temporary_fields[0].field),
+				cand: copy_field(temporary_fields[0].cand),
+				quant: copy_field(temporary_fields[0].quant)
+			};
 			// console.timeEnd("cf");
 			// console.time("rj");
 			reject_once(field.cand[0], data[0]);
@@ -640,6 +657,7 @@ Game.makeField = function (sides, t, seeds) {
 		});
 		// loop
 		while (temporary_fields[0].quant) {
+			// console.log(temporary_fields);
 			// console.log("top: ", temporary_fields[0].quant);
 			var cand = temporary_fields[0].cand[1];
 			if (cand.length) {
@@ -649,12 +667,12 @@ Game.makeField = function (sides, t, seeds) {
 				// } else {
 					// console.log("data: ", data);
 					// var is_more_than1 = cand[0][1];
-					console.time("snf");
+					// console.time("snf");
 					var data = set_next_field();
-					console.timeEnd("snf");
-					console.time("ucd");
+					// console.timeEnd("snf");
+					// console.time("ucd");
 					var next = update_chars_data(data[0], data[1]);
-					console.timeEnd("ucd");
+					// console.timeEnd("ucd");
 					if (!next) {
 						temporary_fields.shift();
 					}
@@ -730,7 +748,11 @@ function view_result (sides, t){
 }
 
 // view_result([16, 16], "flandre");
-view_result([16, 16], "remilia");
+// view_result([16, 16], "remilia");
 // view_result([ 8,  4], "scarlet");
 // view_result([ 7, 10], "onion"  );
 
+// view_result([16, 16], "escape");
+view_result([24, 24], "escape"); // Accepted, 14918.606ms
+
+// view_result([30, 30], "escape"); // Failed
