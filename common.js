@@ -1,106 +1,14 @@
 
-var Game = {},
-	l = function(s) {
-		return document.getElementById(s);
-	};
-
-// var forDebug = {};
-
-// var charReplace = function (str, index, char){
-// 	return str.replace(new RegExp('(^.{' + index + '}).'), '$1' + char);
-// };
-
-// forDebug.showAnythingFromObject = function (object){
-// 	var str = Object.keys(object).filter(function (e){
-// 		return typeof object[e] !== 'undefined';
-// 	});
-// 	console.log(str.join(', '));
-// };
-
-// forDebug.show2Dmap = function (map, h, w){
-// 	var str = Array(h).join('_').split('_').map(function (){
-// 		return Array(w).join('_').split('_').map(function (){return '-'});
-// 	});
-// 	map.forEach(function (e){
-// 		str[e[0]][e[1]] = '#';
-// 	});
-// 	console.log(str.map(function (e){return e.join('')}).join('\n'));
-// 	console.log();
-// };
-
-// forDebug.show2DrealMapStr = function (result, sides){
-// 	console.log();
-// 	if (!result) {
-// 		console.log("=== impossible ===");
-// 	} else {
-// 		if (sides.length !== 2) {
-// 			console.log("=== cannot ouput ===");
-// 		} else {
-// 			for (var i = 0; i < sides[0]; i++){
-// 				var str = '';
-// 				for (var j = 0; j < sides[1]; j++){
-// 					str += result[i + '_' + j];
-// 				}
-// 				console.log(str);
-// 			}
-// 		}
-// 	}
-// 	console.log();
-// };
-
-// forDebug.show2DrealMap = function (f, h, w){
-// 	var ctos = function (c) {
-// 		return c.join('_');
-// 	};
-// 	for (var i = 0; i < h; i++){
-// 		var str = '';
-// 		for (var j = 0; j < w; j++){
-// 			switch (typeof f[ctos([i,j])]){
-// 			case 'undefined':
-// 				str += '.';
-// 				break;
-// 			case 'string':
-// 				str += '#';
-// 				break;
-// 			case 'object':
-// 				str += '=';
-// 				break;
-// 			}
-// 		}
-// 		console.log(str);
-// 	}
-// 	console.log();
-// };
+var Game = {}, gebId = document.getElementById.binf(document);
 
 Game.makeField = function (sides, t, seeds) {
 	// The core function
 	var s = t.length;
 	var dimention = sides.length;
-	// var f = (function (s) {
-	// 	var setArray = function(a) {
-	// 		var p = a.shift();
-	// 		if (a.length) {
-	// 			var x = [];
-	// 			for (var i = 0; i < p; i++) {
-	// 				x.push(setArray(a.slice(0)));
-	// 			}
-	// 			return x;
-	// 		} else {
-	// 			return new Array(p);
-	// 		}
-	// 	};
-	// 	return setArray(s.slice(0));
-	// })(sides);
 	var rand_with_seeds = function (range_size){
-		// console.log("seeds: ", seeds.map(function (e){
-		// 	return(isFinite(e))?'#':'-';
-		// }).join(' '), range_size);
 		var seed = seeds.shift();
-		// console.log("seed: ", seed);
 		var seed_to_use = seed * (range_size || (1 - seed) * 4);
-		// console.log("stu: ", seed_to_use);
 		var result = Math.floor(seed_to_use);
-		// console.log("result: ", result);
 		seeds.push(seed_to_use - result);
 		return [seed, result];
 	};
@@ -119,12 +27,8 @@ Game.makeField = function (sides, t, seeds) {
 		// for an Object, an Array, or a PrimitiveValue.
 		var result;
 		try {
-			// console.log("length:");
 			var strfied = JSON.stringify(x);
-			// console.log(strfied.length);
-			// console.log(strfied);
 			result = JSON.parse(strfied);
-			// console.log("=======");
 		} catch(e){
 			var initial;
 			var is_obj = [Array, Object].some(function (Constructor) {
@@ -238,41 +142,22 @@ Game.makeField = function (sides, t, seeds) {
 		})(dimention);
 		var temporary_fields = [];
 		var axes = function (array, index, substitune) {
-			// if (arguments[3]) {
-				// console.log("in axes: ", Object.keys(array).join(' '));
-				// console.log("f (in) : ", Object.keys(f).join(' '));
-			// }
 			if (isexist(index)) {
 				var strindex = coordinate_to_string(index);
-				// console.log("strindex: ", strindex);
 				if (arguments.length >= 3) {
 					var isfunc = (typeof substitune === 'function');
-					// if (arguments[3]) {
-					// 	console.log("originl: ", array[strindex]);
-					// }
 					array[strindex] = (isfunc ? substitune(array[strindex]) : substitune);
 				}
-				// if (arguments[3]) {
-				// 	console.log("f[", index, "] << ", typeof array[strindex]);
-				// 	console.log("Bool: ", !!array[strindex]);
-				// }
-				// if (arguments[3]) {
-				// 	console.log("inax");
-				// 	forDebug.showAnythingFromObject(array);
-				// }
 				return array[strindex];
 			} else {
 				return void 0;
 			}
 		};
 		var show_candidates = function (f, candidate) {
-			// console.time("show_candidates");
 			var lids = [];
-			// console.log("cand: ", typeof candidate);
 			var is_collapse = candidate.some(function (position){
 				var count = -1, mins = [];
 				var data = axes(f, position);
-				// console.log("pos: ", position, "data: ", typeof data);
 				var wide_min = Infinity;
 				Object.keys(data).forEach(function (can_be_taken){
 					var eachar = data[can_be_taken];
@@ -301,12 +186,6 @@ Game.makeField = function (sides, t, seeds) {
 				mins.sort(function (a, b){
 					return (a[1] - b[1]) || rand_with_seeds()[0] - 1 / 2;
 				});
-				// console.log(" min[1]s: ", mins.map(function (e){
-				// 	return e[1];
-				// }).join(' '));
-				// mins = mins.map(function (e){
-				// 	return e[0];
-				// });
 				var parameter = count * wide_min;
 				lids.push([[position.slice(), mins], parameter]);
 				return false;
@@ -317,17 +196,6 @@ Game.makeField = function (sides, t, seeds) {
 				lids.sort(function (a, b){
 					return (a[0][1] - b[0][1]) || rand_with_seeds()[0] - 1 / 2;
 				});
-				// console.log("lids: ", typeof lids);
-				// return lids.map(function (e){
-				// 	return e[0];
-				// });
-				// console.log(lids[0] === lids[1]);
-				// console.log("lids, ");
-				// console.log(
-					// (lids[0] && [lids[0][1], lids[0][0]]),
-					// (lids[1] && [lids[1][1], lids[1][0]]));
-				// console.log("lids[0][0]: ", lids[0][0]);
-				// console.timeEnd("show_candidates");
 				return lids;
 			}
 		};
@@ -463,28 +331,17 @@ Game.makeField = function (sides, t, seeds) {
 				return ranges;
 			};
 			var f = temporary_fields[0];
-			// f = copy_field(f);
-			// f.cand[1].shift()[1];
-			// reject_once(f.cand[0], diff);
-			// axes(f.field, diff, char);
-			// console.log("diff: ", diff);
 			choice.forEach(function (drtn){
 				var changed = diff.slice();
 				var movements = 0;
-				// console.log("first: ", changed);
 				while (++movements < s) {
-					// console.log("mov: ", movements, s);
-					// console.log("drtn: ", drtn);
 					changed = add_list(changed, drtn);
-					// console.log("coor: ", changed);
 					axes(f.field, changed, function (e){
-						// console.log("e: ", e);
 						switch(typeof e){
 						case 'string':
 							return e;
 						case 'undefined':
 							f.cand[0].push(changed);
-							// console.log("f.cand[0] << ", changed);
 							return show_locatable_chars(changed);
 						case 'object':
 							return expand_range(
@@ -496,15 +353,9 @@ Game.makeField = function (sides, t, seeds) {
 						}
 					});
 				}
-				// console.log();
 			});
-			// console.log("cand[0]: ", f.cand[0].join(' '));
 			if (typeof deb !== 'undefined') {
-				forDebug.show2Dmap(f.cand[0], sides[0], sides[1]);
-				forDebug.show2DrealMap(f.field, sides[0], sides[1]);
 			}
-			// console.log("f.cand[0]: ", typeof f.cand[0]);
-			// console.log("f.cand: ", f.cand);
 			f.cand[1] = show_candidates(f.field, f.cand[0]);
 			f.quant--;
 			return temporary_fields[0] = f;
@@ -523,36 +374,18 @@ Game.makeField = function (sides, t, seeds) {
 			var wrap_tile = function (point) {
 				choice.forEach(function (e) {
 					var near = add_list(point, e);
-					// console.log("point: ", point, ", e:", e,
-					// ", near: ",near);
 					axes(f, near, function (e) {
-						// console.log("near: ", near, ", e: ", e);
-						// console.log("typeof e: ", typeof e);
 						if(typeof e === 'undefined'){
-							// console.log("cand << ", near);
 							candidate.push(near.slice());
-							if (typeof deb !== 'undefined'){
-								forDebug.show2Dmap(candidate, sides[0], sides[1]);
-								forDebug.show2DrealMap(f, sides[0], sides[1]);
-							}
-							// console.log();
-							// return show_locatable_chars(near);
 							var res = show_locatable_chars(near);
-							// console.log("give you ", typeof res);
-							// console.log("res: ", res);
-							// console.log("cf: wrap_tile (543)");
 							return copy_field(res);
 						} else {
 							return e;
 						}
-					}, true);
-					// console.log("returned: " ,ret);
-					// console.log("f (out): ", Object.keys(f).join(' '));
-					// console.log("outax");
+					});
 					if (typeof deb !== 'undefined') {
 						forDebug.showAnythingFromObject(f);
 					}
-					// console.log();
 				});
 			};
 			fill_target();
@@ -561,12 +394,6 @@ Game.makeField = function (sides, t, seeds) {
 				wrap_tile(coordinate);
 				coordinate = add_list(coordinate, v);
 			}
-			// console.log("cand: ", candidate.join(' '));
-			if (typeof deb !== 'undefined') {
-				forDebug.show2Dmap(candidate, sides[0], sides[1]);
-				forDebug.show2DrealMap(f, sides[0], sides[1]);
-			}
-			// console.log("ansO: ", ansO, ", v: ", v);
 			return [candidate, show_candidates(f, candidate)];
 		};
 		var set_next_field = function (){
@@ -580,15 +407,12 @@ Game.makeField = function (sides, t, seeds) {
 					return inspector(e) && arr.splice(i,1);
 				});
 			};
-			// console.time("bef-cf");
 			var seed = 1.0 - Math.sqrt(rand_with_seeds()[0]);
 			var selector = temporary_fields[0].cand[1];
 			var len = selector.length;
 			var i = 0;
 			for (;;) {
-				// console.log("seeder:", selector[i][1]);
 				seed -= (1 / selector[i][1]);
-				// console.log(seed);
 				if (seed <= 0) {
 					break;
 				}
@@ -597,14 +421,12 @@ Game.makeField = function (sides, t, seeds) {
 					i = 0;
 				}
 			}
-			// var data = selector[i][0].shift(); // *
 			seed = 1.0 - Math.sqrt(rand_with_seeds()[0]);
 			var dselector = selector[i][0];
 			var data;
 			len = dselector[1].length;
 			i = 0;
 			for (;;) {
-				// console.log(seed, i);
 				seed -= (1 / dselector[1][i][1]);
 				if (seed <= 0) {
 					break;
@@ -614,34 +436,22 @@ Game.makeField = function (sides, t, seeds) {
 					i = 0;
 				}
 			}
-			// console.log(dselector);
-			// console.log(dselector[i][0]);
 			data = [dselector[0].slice(), dselector[1].splice(i, 1)[0][0]];
-			// console.log(data);
 			if (!dselector.length) {
 				selector.splice(i, 1);
 			}
-			// console.timeEnd("bef-cf");
-			// console.time("cf");
-			// console.log("cf: snf(626)");
 			var field = {
 				field: copy_field(temporary_fields[0].field),
 				cand: copy_field(temporary_fields[0].cand),
 				quant: copy_field(temporary_fields[0].quant)
 			};
-			// console.timeEnd("cf");
-			// console.time("rj");
 			reject_once(field.cand[0], data[0]);
-			// console.timeEnd("rj");
-			// console.log(data);
-			// console.time("aft-rj");
 			axes(field.field, data[0], data[1]);
 			if (data[1]) {
 				temporary_fields.unshift(field);
 			} else {
 				temporary_fields[0] = field;
 			}
-			// console.timeEnd("aft-rj");
 			return data;
 		};
 		var candidate = wrap_first_map();
@@ -649,7 +459,6 @@ Game.makeField = function (sides, t, seeds) {
 			return prev * curr;
 		});
 		quantity -= s;
-		// console.log("Q.E.D. ", quantity);
 		temporary_fields.unshift({
 			field: f,
 			cand: candidate,
@@ -657,26 +466,13 @@ Game.makeField = function (sides, t, seeds) {
 		});
 		// loop
 		while (temporary_fields[0].quant) {
-			// console.log(temporary_fields);
-			// console.log("top: ", temporary_fields[0].quant);
 			var cand = temporary_fields[0].cand[1];
 			if (cand.length) {
-				// var data = cand[0][0].shift();
-				// if (!data) {
-				// 	cand.shift();
-				// } else {
-					// console.log("data: ", data);
-					// var is_more_than1 = cand[0][1];
-					// console.time("snf");
-					var data = set_next_field();
-					// console.timeEnd("snf");
-					// console.time("ucd");
-					var next = update_chars_data(data[0], data[1]);
-					// console.timeEnd("ucd");
-					if (!next) {
-						temporary_fields.shift();
-					}
-				// }
+				var data = set_next_field();
+				var next = update_chars_data(data[0], data[1]);
+				if (!next) {
+					temporary_fields.shift();
+				}
 			} else {
 				temporary_fields.shift();
 				if (!temporary_fields.length) {
@@ -704,29 +500,10 @@ Game.makeField = function (sides, t, seeds) {
 		});
 		var howmany = radixs.shift();
 		radixs.reverse();
-		// var denomins = [];
-		// var denomin = 1;
-		// var vlist = (function () {
-		// 	var a = [];
-		// 	for (var i = dimention; i--;) {
-		// 		var p = [0];
-		// 		if (ansO[i] + 1 >= s) {
-		// 			p.push(-1);
-		// 		}
-		// 		if (sides[i] - ansO[i] >= s) {
-		// 			p.push(+1);
-		// 		}
-		// 		a.unshift(p);
-		// 		denomins.unshift(denomin);
-		// 		denomin *= p.length;
-		// 	}
-		// 	return a;
-		// })();
 		var intseed = rand_with_seeds(howmany - 1)[0] + 1;
 		var v = vlist.map(function (e, i) {
 			return e[Math.floor(intseed / radixs[i]) % e.length];
 		});
-		// console.log(v);
 		return v;
 	};
 	var v = pick_vector(ansO, sides, s);
