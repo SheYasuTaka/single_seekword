@@ -47,12 +47,13 @@ div {
 .page {
 	border-radius: 3px;
 	-webkit-box-orient: vertical;
-	transition: 200ms transform;
+	transition: opacity 200ms ease;
+	opacity: 1;
 	box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
 	color: #333;
-	width: 400px;
+	width: 500px;
 	/* v==diff==v @chiwawa_star */
-	height: 340px;
+	height: 400px;
 	padding: 10px;
 	z-index: 1000;
 	position: absolute;
@@ -83,7 +84,9 @@ div {
 	margin: 0 auto;
 }
 
-
+#game-body {
+	visibility: hidden;
+}
 
 
 

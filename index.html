@@ -7,42 +7,46 @@
 	<script type="text/javascript" src="common.js">
 	</script>
 </head>
-<body>
+<body onload="startup()">
 	<!--body start-->
 	<div id="settings" class="page" style="max-height: 640px;">
-		<h1>Game settings</h1>
+		<h1>ゲーム設定 - Game settings</h1>
 		<div class="content-area">
 			<section>
-				<h3>Board size</h3>
+				<h3>難易度 - level</h3>
 				<div class="setting-container">
 					<div class="input-div">
 						<div>
-							<input type=radio name="boardsize" value="easy">
-							easy (8x8)<br>
-							<input type=radio name="boardsize" value="normal">
-							normal (16x16)<br>
-							<input type=radio name="boardsize" value="hard">
-							hard (24x24)<br>
+							<input type=radio name="boardsize" value="easy" id="easy">
+							<label for="easy">easy (8x8)</label><br>
+							<input type=radio name="boardsize" value="normal" id="normal">
+							<label for="normal">normal (16x16)</label><br>
+							<input type=radio name="boardsize" value="hard" id="hard">
+							<label for="hard">hard (24x24)</label><br>
 						</div>
 					</div>
 				</div>
 			</section>
 			<section>
-				<h3>Text to find</h3>
+				<h3>隠す文字列 - hider</h3>
 				<div class="setting-container">
 					<div class="input-div">
 						<div>
-							<input type=text name="texttofind" placeholder="Text here">
+							<input type=text id="texttofind" placeholder="Text here">
 						</div>
 					</div>
 				</div>
 			</section>
 		</div>
 		<div class="action-area">
-			<div class="button-strip" reversed="">
-			<button id="font-settings-confirm" class="default-button" i18n-content="done">Start</button>
+			<div class="button-strip" reversed>
+				<button id="settings-confirm" class="default-button" onclick="">Start</button>
 			</div>
 		</div>
+	</div>
+	<div id="game-body">
+		<p id="message"></p>
+		<table id="board"></table>
 	</div>
 	<!--body end-->
 </body>

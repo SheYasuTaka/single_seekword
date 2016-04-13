@@ -1,22 +1,23 @@
 
-var Game = {}, gebId = document.getElementById.binf(document);
+var Game = {};
+var gebId = document.getElementById.bind(document),
+	gesbName = document.getElementsByName.bind(document);
+
+Game.coordinate_to_string = function (c) {
+	return c.join('_');
+};
 
 Game.makeField = function (sides, t, seeds) {
 	// The core function
 	var s = t.length;
 	var dimention = sides.length;
+	var coordinate_to_string = Game.coordinate_to_string;
 	var rand_with_seeds = function (range_size){
 		var seed = seeds.shift();
 		var seed_to_use = seed * (range_size || (1 - seed) * 4);
 		var result = Math.floor(seed_to_use);
 		seeds.push(seed_to_use - result);
 		return [seed, result];
-	};
-	var coordinate_to_string = function (c) {
-		return c.join('_');
-	};
-	var string_to_coordinate = function (s) {
-		return s.split('_').map(function (e){return parseInt(e, 10)});
 	};
 	var isexist = function (array) {
 		return array.every(function (e,i){
@@ -510,6 +511,91 @@ Game.makeField = function (sides, t, seeds) {
 	return create(ansO, v);
 };
 
+Game.forHTML = {};
+
+Game.forHTML.writeTable = function (h, w, field){
+	var table = gebId("board");
+	var html = "";
+	for (var i = 0; i < h; i++) {
+		html += "<tr>";
+		for(var j = 0; j < w; j++) {
+			html += `<th>${field[Game.coordinate_to_string([i,j])]}</th>`;
+		}
+		html += "</tr>";
+	}
+	table.innerHTML += html;
+};
+
+Game.forHTML.gamestart = function (result, field){
+	gebId("game-body").style.visibility = "visible";
+	gebId("message").innerHTML = `Find <font color=red>${result.hider}</font>`;
+	Game.forHTML.writeTable(...result.size[0], field);
+};
+
+function startup(){
+	gebId("settings-confirm").onclick = function (){
+		var rands = function (howmany){
+			return ' '.repeat(howmany || 16).split('').map(Math.random);
+		};
+		var checker = function (){
+			var boardsizes = [
+				[[ 8,  8], 1],
+				[[16, 16], 10],
+				[[24, 24], 60]
+			];
+			var checktext = function (text, boardsize) {
+				if (!text) {
+					return "隠す文字列を入力して下さい";
+				} else if (text.split('').every(function (e){return e === text[0]})) {
+					return "文字は2種類以上なければなりません";
+				} else if (boardsize && boardsize.every(function (e){
+					return e < text.length;
+				})) {
+					return "文字列が長すぎます";
+				} else {
+					return "";
+				}
+			};
+			var errormess = [];
+			var select = gesbName("boardsize");
+			var gamemode = void 0;
+			for (var i = 0; i < select.length; i++) {
+				if (select[i].checked) {
+					gamemode = i;
+					break;
+				}
+			}
+			var boardsize = boardsizes[i];
+			if (!boardsize) {
+				errormess.push("難易度を選択して下さい");
+			}
+			var text = gebId("texttofind").value;
+			var isinvalid = checktext(text, boardsize[0]);
+			if (isinvalid) {
+				errormess.push(isinvalid);
+			}
+			if (errormess.length) {
+				alert(errormess.join('\n'));
+				return null;
+			} else {
+				return {size: boardsize, hider: text};
+			}
+		};
+		var shower = function (result){
+			//
+			gebId("settings").style.opacity = 0;
+			var field = Game.makeField(result.size[0], result.hider, rands()); // TODO: 並列してグラフィック
+			Game.forHTML.gamestart(result, field);
+			// TODO: ゲーム本体
+		};
+		var result = checker();
+		if (!result) {
+			return false;
+		}
+		shower(result);
+	};
+}
+
 // TODO: コメントつけろ
 // TODO: オーダーおとせ
 
@@ -521,7 +607,7 @@ Game.makeField = function (sides, t, seeds) {
 // 			return Math.random();
 // 		})));
 // 	console.timeEnd("view_result");
-// 	forDebug.show2DrealMapStr(result, sides);
+// 	console.log(result.map(function (e){return e.join('')}).join('\n'));
 // }
 
 // view_result([16, 16], "flandre");
@@ -529,6 +615,7 @@ Game.makeField = function (sides, t, seeds) {
 // view_result([ 8,  4], "scarlet");
 // view_result([ 7, 10], "onion"  );
 
+// view_result([ 8,  8], "escape"); // Accepted,   239.900ms
 // view_result([16, 16], "escape"); // Accepted,  3383.734ms
 // view_result([24, 24], "escape"); // Accepted, 14918.606ms
 
