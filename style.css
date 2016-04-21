@@ -47,33 +47,20 @@ div {
 .page {
 	border-radius: 3px;
 	-webkit-box-orient: vertical;
-	transition: opacity 200ms ease;
+	transition: opacity 500ms ease;
 	opacity: 1;
 	box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
 	color: #333;
 	width: 500px;
-	/* v==diff==v @chiwawa_star */
 	height: 400px;
 	padding: 10px;
-	z-index: 1000;
+	z-index: -114514;
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	margin: auto;
-}
-
-.page > .close-button {
-	background-image: url(./image/close-button.png);
-	background-position: center;
-	background-repeat: no-repeat;
-	height: 14px;
-	position: absolute;
-	right: 7px;
-	top: 7px;
-	width: 14px;
-	z-index: 1;
 }
 
 .page > .content-area {
@@ -86,12 +73,45 @@ div {
 
 #game-body {
 	visibility: hidden;
+	text-align: center;
 }
 
+#board th:hover {
+	background-color: #A1CBED;
+}
 
+#board th.selected {
+	background-color: #3172B2;
+}
 
+#board, #board tr, #board th {
+	border: solid 3px #888;
+}
 
+#board th.correct {
+	background-color: #4BB754;
+}
 
+#board th {
+	font-size: 20px;
+	width: 24px;
+	height: 24px;
+}
+
+#board.failed th:not(.selected) {
+	animation-name: scarlet-flash;
+	animation-duration: 500ms;
+	animation-timing-function: ease;
+}
+
+@keyframes scarlet-flash {
+	0%, 100% {
+		background-color: white;
+	}
+	50% {
+		background-color: #DE3838;
+	}
+}
 
 
 
