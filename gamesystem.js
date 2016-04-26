@@ -9,12 +9,22 @@ var makeField = function (sides, t, seeds, hash) {
 		var seed = seeds.shift();
 		var seed_to_use = seed * (range_size || (1 - seed) * 4);
 		var result = Math.floor(seed_to_use);
-		seeds.push(seed_to_use - result);
+		seeds.push(seed_to_use - result || 0.5);
 		return [seed, result];
 	};
 
+	var shuffle_rand = function (seed, categories) {
+		// if (seeds[0]) console.log(seed, categories, seeds[0]);
+		
+		var result = (Math.floor(seed * categories) + rand_with_seeds(categories)[0]) / categories;
+		
+		// if (result) console.log(result);
+
+		return result;
+	};
+
 	var isexist = function (array) {
-		return array.every(function (e,i) {
+		return array.every((e, i) => {
 			return (0 <= e) && (e < sides[i]);
 		});
 	};
@@ -28,7 +38,7 @@ var makeField = function (sides, t, seeds, hash) {
 			result = JSON.parse(strfied);
 		} catch(e) {
 			var initial;
-			var is_obj = [Array, Object].some(function (Constructor) {
+			var is_obj = [Array, Object].some((Constructor) => {
 				if (x instanceof Constructor) {
 					initial = new Constructor();
 					return true;
@@ -38,7 +48,7 @@ var makeField = function (sides, t, seeds, hash) {
 			});
 
 			if (is_obj) {
-				Object.keys(x).forEach(function (key) {
+				Object.keys(x).forEach((key) => {
 					initial[key] = copy_field(x[key]);
 				});
 
@@ -56,26 +66,22 @@ var makeField = function (sides, t, seeds, hash) {
 		var sides = S.slice();
 
 		for (;;) {
-			var whole = sides.reduce(function (sum, e) {
-				return sum * e;
-			});
+			var whole = sides.reduce((sum, e) => sum * e);
 			var redun = 1;
 
-			sides.forEach(function (e, i) {
+			sides.forEach((e, i) => {
 				redun *= Math.min(Math.max(0, s * 2 - S[i]), e);
 			});
 			range += whole - redun;
 
-			sides = sides.map(function (e) {
-				return e - 2;
-			});
+			sides = sides.map((e) => e - 2);
 
 			if (sides.some(e => e <= 0)) break;
 		}
 
 		var index = S.map(() => 0);
 
-		var incr = function () {
+		var incr = () => {
 			var i = dimention;
 			while (i--) {
 				if (++index[i] < S[i]) break;
@@ -83,11 +89,11 @@ var makeField = function (sides, t, seeds, hash) {
 			}
 		};
 
-		var steam = function () {
+		var steam = () => {
 			var minIndex = Infinity;
 			var redunFlag = true;
 
-			index.forEach(function (e, i) {
+			index.forEach((e, i) => {
 				minIndex = Math.min(minIndex, e, S[i] - e - 1);
 
 				if (e < S[i] - s || e >= s) {
@@ -106,14 +112,14 @@ var makeField = function (sides, t, seeds, hash) {
 		return index;
 	};
 
-	var add_list = function (l, r) {
-		return l.map(function (e, i) {
+	var add_list = (l, r) => {
+		return l.map((e, i) => {
 			return e + r[i];
 		});
 	};
 
-	var sub_list = function (l, r) {
-		return l.map(function (e, i) {
+	var sub_list = (l, r) => {
+		return l.map((e, i) => {
 			return e - r[i];
 		});
 	};
@@ -140,9 +146,7 @@ var makeField = function (sides, t, seeds, hash) {
 					}
 				}
 
-				ans.push(v.map(function (e) {
-					return list[e];
-				}));
+				ans.push(v.map((e) => list[e]));
 			}
 		})(dimention);
 
@@ -168,23 +172,25 @@ var makeField = function (sides, t, seeds, hash) {
 		var show_candidates = function (f, candidate) {
 			var lids = [];
 
-			var is_collapse = candidate.some(function (position) {
+			var is_collapse = candidate.some((position) => {
 				var count = -1, mins = [];
 				var data = axes(f, position);
 
-				var wide_min = Infinity;
+				var wide_min = "Infinity";
 
-				Object.keys(data).forEach(function (can_be_taken) {
+				Object.keys(data).forEach((can_be_taken) => {
 					var eachar = data[can_be_taken];
+
+					// console.log("eachar:\n", eachar, "\n=======");
 
 					if (!eachar) return;
 
 					count++;
 
-					var narrow_min = Infinity;
-					Object.keys(eachar).forEach(function (e) {
+					var narrow_min = "Infinity";
+					Object.keys(eachar).forEach((e) => {
 						var each_drtn = eachar[e];
-						each_drtn.forEach(function (e) {
+						each_drtn.forEach((e) => {
 							var holes = e[1];
 							if (holes < narrow_min) narrow_min = holes;
 						});
@@ -195,11 +201,13 @@ var makeField = function (sides, t, seeds, hash) {
 					if (narrow_min < wide_min) wide_min = narrow_min;
 				});
 
+				// console.log(position, count);
+
 				if (count < 0) return true;
 
-				mins.sort(function (a, b) {
-					return (a[1] - b[1]) || rand_with_seeds()[0] - 1/2;
-				});
+				mins.sort((a, b) => 
+					((a[1] - b[1]) || rand_with_seeds()[0] - 1/2)
+				);
 
 				var parameter = count * wide_min;
 				lids.push([[position.slice(), mins], parameter]);
@@ -210,9 +218,9 @@ var makeField = function (sides, t, seeds, hash) {
 			if (is_collapse) {
 				return null;
 			} else {
-				lids.sort(function (a, b) {
-					return (a[0][1] - b[0][1]) || rand_with_seeds()[0] - 1/2;
-				});
+				lids.sort((a, b) => 
+					((a[0][1] - b[0][1]) || rand_with_seeds()[0] - 1/2)
+				);
 				return lids;
 			}
 		};
@@ -221,19 +229,21 @@ var makeField = function (sides, t, seeds, hash) {
 			var longest_substr = function (which, origin, direction) {
 				var l = which, r = which;
 				var holes = 0;
-				var canyoucomplete = true;
 				var position, elem;
 
 				position = origin.slice();
-				while (--l >= 0) {
+				for (;;) {
+					--l;
 					position = sub_list(position, direction);
 
-					--l;
-
 					elem = axes(f, position);
-					if (typeof elem === 'string' && elem !== splitext[l] ||
+
+					// console.log("l,", l, position, elem);
+
+					if (l < 0 || !isexist(position) ||
+						  typeof elem === 'string' && elem !== splitext[l] ||
 						  typeof elem === 'object' && !elem[splitext[l]]) {
-						canyoucomplete = false;
+						holes = "Infinity";
 
 						l++;
 
@@ -244,15 +254,18 @@ var makeField = function (sides, t, seeds, hash) {
 				}
 
 				position = origin.slice();
-				while (r < s) {
+				for (;;) {
+					++r;
 					position = add_list(position, direction);
 
-					++r;
-
 					elem = axes(f, position);
-					if (typeof elem === 'string' && elem !== splitext[r] ||
+
+					// console.log("r,", r, position, elem);
+
+					if (r >= s || !isexist(position) ||
+						  typeof elem === 'string' && elem !== splitext[r] ||
 						  typeof elem === 'object' && !elem[splitext[r]]) {
-						canyoucomplete = false;
+						holes = "Infinity";
 
 						r--;
 
@@ -262,17 +275,19 @@ var makeField = function (sides, t, seeds, hash) {
 					}
 				}
 
-				if (!canyoucomplete) holes = Infinity;
-
-				return ([which, holes]);
+				if (holes) {
+					return ([which, holes]);
+				} else {
+					return null;
+				}
 			};
 
 			var result = {};
-			splitext.forEach(function (char, index) {
-				if (typeof result[char] === 'undefined')  result[char] = {};
+			splitext.forEach((char, index) => {
+				if (typeof result[char] === 'undefined') result[char] = {};
 				if (!result[char]) return 0;
 
-				choice.every(function (dtrn) {
+				choice.every((dtrn) => {
 					var x = longest_substr(index, c, dtrn);
 					if(!x) {
 						result[char] = null;
@@ -298,14 +313,18 @@ var makeField = function (sides, t, seeds, hash) {
 				var positive = hash(drtn);
 				var negative = hash(drtn.map(e => -e));
 
-				Object.keys(ranges).forEach(function (can_be_taken) {
+				Object.keys(ranges).forEach((can_be_taken) => {
 					var is_collapse;
 
-					is_collapse = Object.keys(ranges[can_be_taken][positive]).some(function (e) {
+					if (!ranges[can_be_taken]) {
+						return;
+					}
+
+					is_collapse = Object.keys(ranges[can_be_taken][positive]).some((e) => {
 						if (!isFinite(e[1])) return false;
 
 						if (t[e[0] - movements] !== char) {
-							e[1] = Infinity;
+							e[1] = "Infinity";
 							return false;
 						}
 
@@ -321,11 +340,11 @@ var makeField = function (sides, t, seeds, hash) {
 						return;
 					}
 
-					is_collapse = Object.keys(ranges[can_be_taken][negative]).some(function (e) {
+					is_collapse = Object.keys(ranges[can_be_taken][negative]).some((e) => {
 						if (!isFinite(e[1])) return false;
 
 						if (t[e[0] + movements] !== char) {
-							e[1] = Infinity;
+							e[1] = "Infinity";
 							return false;
 						}
 
@@ -338,7 +357,10 @@ var makeField = function (sides, t, seeds, hash) {
 						return true;
 					});
 
-					if (is_collapse) ranges[can_be_taken] = null;
+					if (is_collapse) {
+						ranges[can_be_taken] = null;
+						return;
+					}
 				});
 
 				return ranges;
@@ -346,7 +368,7 @@ var makeField = function (sides, t, seeds, hash) {
 
 			var f = temporary_fields[0];
 
-			choice.forEach(function (drtn) {
+			choice.forEach((drtn) => {
 				var changed = diff.slice();
 				var movements = 0;
 
@@ -372,7 +394,7 @@ var makeField = function (sides, t, seeds, hash) {
 			return temporary_fields[0] = f;
 		};
 
-		var wrap_first_map = () => {
+		var wrap_first_map = function () {
 			var coordinate = ansO.slice();
 			var candidate = [];
 
@@ -387,9 +409,9 @@ var makeField = function (sides, t, seeds, hash) {
 			};
 
 			var wrap_tile = function (point) {
-				choice.forEach(function (e) {
+				choice.forEach((e) => {
 					var near = add_list(point, e);
-					axes(f, near, function (e) {
+					axes(f, near, (e) => {
 						if (typeof e === 'undefined') {
 							candidate.push(near.slice());
 							var res = show_locatable_chars(near);
@@ -427,16 +449,23 @@ var makeField = function (sides, t, seeds, hash) {
 			var selector = temporary_fields[0].cand[1];
 			var len = selector.length;
 
+			// console.log("Line 443");
+
 			var i = 0;
 			for (;;) {
-				seed -= (1 / selector[i][1]);
+				// console.log(seed);
+
+				seed -= shuffle_rand(1 / selector[i][1], len + 1);
+
+				// console.log("Line 451");
 
 				if (seed <= 0) break;
 
 				i++;
-
 				if (i === len) i = 0;
 			}
+
+			// console.log("sel:", selector[i]);
 
 			seed = 1.0 - Math.sqrt(rand_with_seeds()[0]);
 			var dselector = selector[i][0];
@@ -444,18 +473,26 @@ var makeField = function (sides, t, seeds, hash) {
 			len = dselector[1].length;
 
 			i = 0;
+
+			// console.log("Line 464")
+
 			for (;;) {
-				seed -= (1 / dselector[1][i][1]);
+				seed -= shuffle_rand(1 / dselector[1][i][1], len + 1);
 
 				if (seed <= 0) break;
 
 				i++;
-
 				if (i === len) i = 0;
 			}
 
+			// console.log("Line 475");
+
+			// console.log("dsel:", dselector[1]);
+
 			data = [dselector[0].slice(), dselector[1].splice(i, 1)[0][0]];
 			if (!dselector.length) selector.splice(i, 1);
+
+			// console.log("data:", data);
 
 			var field = {
 				field: copy_field(temporary_fields[0].field),
@@ -476,9 +513,7 @@ var makeField = function (sides, t, seeds, hash) {
 		};
 
 		var candidate = wrap_first_map();
-		var quantity = sides.reduce(function (prev, curr) {
-			return prev * curr;
-		});
+		var quantity = sides.reduce((prev, curr) => (prev * curr));
 		quantity -= s;
 
 		temporary_fields.unshift({
@@ -489,10 +524,20 @@ var makeField = function (sides, t, seeds, hash) {
 
 		// loop
 		while (temporary_fields[0].quant) {
+
+			// console.log(temporary_fields.map((e) => e.cand));
+
 			var cand = temporary_fields[0].cand[1];
+
+			// console.log(cand);
+			// console.log(temporary_fields[0].quant);
+
 			if (cand.length) {
+				// console.log("Line 516");
 				var data = set_next_field();
+				// console.log("Line 518");
 				var next = update_chars_data(data[0], data[1]);
+				// console.log("Line 520");
 				if (!next) {
 					temporary_fields.shift();
 				}
@@ -509,7 +554,7 @@ var makeField = function (sides, t, seeds, hash) {
 
 	var pick_vector = function (ansO, sides, s) {
 		var radixs = [1];
-		var vlist = ansO.map(function (e, i) {
+		var vlist = ansO.map((e, i) => {
 			var cand = [0];
 
 			if (e + 1 >= s) cand.push(-1);
@@ -524,10 +569,10 @@ var makeField = function (sides, t, seeds, hash) {
 
 		radixs.reverse();
 
-		var intseed = rand_with_seeds(howmany - 1)[0] + 1;
-		var v = vlist.map(function (e, i) {
-			return e[Math.floor(intseed / radixs[i]) % e.length];
-		});
+		var intseed = rand_with_seeds(howmany - 1)[1] + 1;
+		var v = vlist.map((e, i) => 
+			e[Math.floor(intseed / radixs[i]) % e.length]
+		);
 
 		return v;
 	};
@@ -542,3 +587,16 @@ onmessage = function (event) {
 	var res = event.data;
 	postMessage(makeField(...res.args, eval(`(${res.hash})`)));
 };
+
+function f(...rest) {
+	var result = makeField(...rest);
+	for (var i = 0; i < rest[0][0]; i++) {
+		var s = '';
+		for (var j = 0; j < rest[0][1]; j++) {
+			s += result[rest[3]([i, j])];
+		}
+		console.log(s);
+	}
+}
+
+f([16, 16], "the", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
