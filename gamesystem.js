@@ -9,16 +9,18 @@ var makeField = function (sides, t, seeds, hash) {
 		var seed = seeds.shift();
 		var seed_to_use = seed * (range_size || (1 - seed) * 4);
 		var result = Math.floor(seed_to_use);
-		seeds.push(seed_to_use - result || 0.5);
+		seeds.push(seed_to_use - result/* || 0.9*/);
 		return [seed, result];
 	};
 
 	var shuffle_rand = function (seed, categories) {
 		// if (seeds[0]) console.log(seed, categories, seeds[0]);
+		 
+		var data = rand_with_seeds(categories);
 		
-		var result = (Math.floor(seed * categories) + rand_with_seeds(categories)[0]) / categories;
+		var result = (data[1] + data[0]) / categories;
 		
-		// if (result) console.log(result);
+		console.log(result);
 
 		return result;
 	};
@@ -185,6 +187,8 @@ var makeField = function (sides, t, seeds, hash) {
 
 					if (!eachar) return;
 
+					// console.log(can_be_taken);
+
 					count++;
 
 					var narrow_min = "Infinity";
@@ -210,6 +214,11 @@ var makeField = function (sides, t, seeds, hash) {
 				);
 
 				var parameter = count * wide_min;
+				if (!parameter) parameter = 0;
+
+				// console.log(count, wide_min);
+				// console.log("param:", parameter);
+
 				lids.push([[position.slice(), mins], parameter]);
 
 				return false;
@@ -231,16 +240,20 @@ var makeField = function (sides, t, seeds, hash) {
 				var holes = 0;
 				var position, elem;
 
+				// console.log(temporary_fields.length);
+				// console.log("w", which);
+
+				var fld = temporary_fields.length ? temporary_fields[0].field : f;
+
 				position = origin.slice();
-				for (;;) {
-					--l;
+				while (--l >= 0) {
 					position = sub_list(position, direction);
 
-					elem = axes(f, position);
+					elem = axes(fld, position);
 
-					// console.log("l,", l, position, elem);
+					// console.log("l,", l, position, typeof elem);
 
-					if (l < 0 || !isexist(position) ||
+					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[l] ||
 						  typeof elem === 'object' && !elem[splitext[l]]) {
 						holes = "Infinity";
@@ -248,21 +261,20 @@ var makeField = function (sides, t, seeds, hash) {
 						l++;
 
 						break;
-					} else if (typeof elem !== 'string') {
+					} else if (typeof holes !== 'string' && typeof elem !== 'string') {
 						holes++;
 					}
 				}
 
 				position = origin.slice();
-				for (;;) {
-					++r;
+				while (++r >= s) {
 					position = add_list(position, direction);
 
-					elem = axes(f, position);
+					elem = axes(fld, position);
 
-					// console.log("r,", r, position, elem);
+					// console.log("r,", r, position, typeof elem);
 
-					if (r >= s || !isexist(position) ||
+					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[r] ||
 						  typeof elem === 'object' && !elem[splitext[r]]) {
 						holes = "Infinity";
@@ -270,10 +282,12 @@ var makeField = function (sides, t, seeds, hash) {
 						r--;
 
 						break;
-					} else if (typeof elem !== 'string') {
+					} else if (typeof holes !== 'string' && typeof elem !== 'string') {
 						holes++;
 					}
 				}
+
+				// console.log("lss", origin, holes);
 
 				if (holes) {
 					return ([which, holes]);
@@ -436,11 +450,7 @@ var makeField = function (sides, t, seeds, hash) {
 
 		var set_next_field = () => {
 			var reject_once = (arr, coor) => {
-				var inspector = (x) => {
-					return x.every((elem, index) => {
-						return elem === coor[index];
-					});
-				};
+				var inspector = x => x.every((elem, index) => elem === coor[index]);
 
 				return arr.some((e, i) => (inspector(e) && arr.splice(i,1)));
 			};
@@ -453,7 +463,7 @@ var makeField = function (sides, t, seeds, hash) {
 
 			var i = 0;
 			for (;;) {
-				// console.log(seed);
+				// console.log(selector[i][1], seed);
 
 				seed -= shuffle_rand(1 / selector[i][1], len + 1);
 
@@ -530,7 +540,7 @@ var makeField = function (sides, t, seeds, hash) {
 			var cand = temporary_fields[0].cand[1];
 
 			// console.log(cand);
-			// console.log(temporary_fields[0].quant);
+			console.log(temporary_fields[0].quant);
 
 			if (cand.length) {
 				// console.log("Line 516");
@@ -570,9 +580,7 @@ var makeField = function (sides, t, seeds, hash) {
 		radixs.reverse();
 
 		var intseed = rand_with_seeds(howmany - 1)[1] + 1;
-		var v = vlist.map((e, i) => 
-			e[Math.floor(intseed / radixs[i]) % e.length]
-		);
+		var v = vlist.map((e, i) => e[Math.floor(intseed / radixs[i]) % e.length]);
 
 		return v;
 	};
@@ -599,4 +607,4 @@ function f(...rest) {
 	}
 }
 
-f([16, 16], "the", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
+f([16, 16], "myonmyon", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
