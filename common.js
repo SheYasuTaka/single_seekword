@@ -31,7 +31,9 @@ Game.forHTML.succeed = (orig, vect) => {
 	};
 
 	var resulttimeMS = (new Date() - Game.starttime);
-	// console.log(resulttime);
+
+	document.onkeydown = null;
+
 	clearEffect(orig, vect, resulttimeMS);
 };
 

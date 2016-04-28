@@ -252,7 +252,7 @@ var makeField = function (sides, t, seeds, hash) {
 
 					elem = axes(fld, position);
 
-					console.log("l,", l, position, typeof elem);
+					// console.log("l,", l, position, typeof elem);
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[l] ||
@@ -275,7 +275,7 @@ var makeField = function (sides, t, seeds, hash) {
 
 					elem = axes(fld, position);
 
-					console.log("r,", r, position, typeof elem);
+					// console.log("r,", r, position, typeof elem);
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[r] ||
@@ -292,8 +292,8 @@ var makeField = function (sides, t, seeds, hash) {
 					// console.log(holes);
 				}
 
-				console.log("lss", origin, holes);
-				console.log();
+				// console.log("lss", origin, holes);
+				// console.log();
 
 				if (holes) {
 					return ([which, holes]);
@@ -566,8 +566,6 @@ var makeField = function (sides, t, seeds, hash) {
 
 		return temporary_fields[0].field;
 	};
-	var ansO = rev_rand(sides, s);
-	// console.log(ansO);
 
 	var pick_vector = function (ansO, sides, s) {
 		var radixs = [1];
@@ -592,6 +590,7 @@ var makeField = function (sides, t, seeds, hash) {
 		return v;
 	};
 
+	var ansO = rev_rand(sides, s);
 	var v = pick_vector(ansO, sides, s);
 	return create(ansO, v);
 };
