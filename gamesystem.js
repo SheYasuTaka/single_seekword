@@ -20,7 +20,7 @@ var makeField = function (sides, t, seeds, hash) {
 		
 		var result = (data[1] + data[0]) / categories;
 		
-		console.log(result);
+		// console.log(result);
 
 		return result;
 	};
@@ -183,6 +183,7 @@ var makeField = function (sides, t, seeds, hash) {
 				Object.keys(data).forEach((can_be_taken) => {
 					var eachar = data[can_be_taken];
 
+					// console.log(can_be_taken);
 					// console.log("eachar:\n", eachar, "\n=======");
 
 					if (!eachar) return;
@@ -251,7 +252,7 @@ var makeField = function (sides, t, seeds, hash) {
 
 					elem = axes(fld, position);
 
-					// console.log("l,", l, position, typeof elem);
+					console.log("l,", l, position, typeof elem);
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[l] ||
@@ -264,15 +265,17 @@ var makeField = function (sides, t, seeds, hash) {
 					} else if (typeof holes !== 'string' && typeof elem !== 'string') {
 						holes++;
 					}
+
+					// console.log(holes);
 				}
 
 				position = origin.slice();
-				while (++r >= s) {
+				while (++r < s) {
 					position = add_list(position, direction);
 
 					elem = axes(fld, position);
 
-					// console.log("r,", r, position, typeof elem);
+					console.log("r,", r, position, typeof elem);
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[r] ||
@@ -285,9 +288,12 @@ var makeField = function (sides, t, seeds, hash) {
 					} else if (typeof holes !== 'string' && typeof elem !== 'string') {
 						holes++;
 					}
+
+					// console.log(holes);
 				}
 
-				// console.log("lss", origin, holes);
+				console.log("lss", origin, holes);
+				console.log();
 
 				if (holes) {
 					return ([which, holes]);
@@ -465,7 +471,7 @@ var makeField = function (sides, t, seeds, hash) {
 			for (;;) {
 				// console.log(selector[i][1], seed);
 
-				seed -= shuffle_rand(1 / selector[i][1], len + 1);
+				seed -= shuffle_rand(1 / selector[i][1], len + 1) * (len + 1);
 
 				// console.log("Line 451");
 
@@ -487,7 +493,7 @@ var makeField = function (sides, t, seeds, hash) {
 			// console.log("Line 464")
 
 			for (;;) {
-				seed -= shuffle_rand(1 / dselector[1][i][1], len + 1);
+				seed -= shuffle_rand(1 / dselector[1][i][1], len + 1) * (len + 1);
 
 				if (seed <= 0) break;
 
@@ -549,12 +555,13 @@ var makeField = function (sides, t, seeds, hash) {
 				var next = update_chars_data(data[0], data[1]);
 				// console.log("Line 520");
 				if (!next) {
+					// console.log("shit shift");
 					temporary_fields.shift();
 				}
 			} else {
 				temporary_fields.shift();
-				if (!temporary_fields.length) return null;
 			}
+			if (!temporary_fields.length) return null;
 		}
 
 		return temporary_fields[0].field;
@@ -607,4 +614,7 @@ function f(...rest) {
 	}
 }
 
-f([16, 16], "myonmyon", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
+
+if (typeof deb !== 'undefined') {
+	f([16, 16], "the", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
+}

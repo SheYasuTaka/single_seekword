@@ -54,7 +54,7 @@ div {
 	width: 500px;
 	height: 400px;
 	padding: 10px;
-	z-index: -114514;
+	z-index: -1919;
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -72,8 +72,9 @@ div {
 }
 
 #game-body {
-	visibility: hidden;
+	opacity: 0;
 	text-align: center;
+	transition: opacity 500ms ease;
 }
 
 #board th:hover {
@@ -113,7 +114,10 @@ div {
 	}
 }
 
-
+.page#game-result {
+	opacity: 0;
+	z-index: -114514;
+}
 
 
 

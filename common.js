@@ -17,17 +17,22 @@ Game.forHTML = {};
 Game.forHTML.taped = null;
 
 Game.forHTML.succeed = (orig, vect) => {
-	var clearEffect = (orig, vect, time) => {
+	var clearEffect = (orig, vect, timeMS) => {
 		var n = Game.fielddata.hider.split('').length;
 		while (n--) {
 			gebId("board").rows[orig[0]].cells[orig[1]].classList.add('correct');
 			orig = orig.map((e, i) => (e + vect[i]));
 		}
+		gebId("game-body").style.opacity = 1/8;
+		gebId("game-result").style.opacity = 1;
+		gebId("result-level").innerText = Game.level.join('x');
+		gebId("result-timer").innerText = timeMS / 1000;
+		gebId("result-mistakes").innerText = Game.failed;
 	};
 
-	var resulttime = new Date() - Game.starttime;
+	var resulttimeMS = (new Date() - Game.starttime);
 	// console.log(resulttime);
-	clearEffect(orig, vect, resulttime);
+	clearEffect(orig, vect, resulttimeMS);
 };
 
 Game.forHTML.fail = () => {
@@ -129,8 +134,9 @@ Game.forHTML.gamestart = (result, field) => {
 	};
 
 	gebId("settings").style.opacity = 0;
-	gebId("game-body").style.visibility = "visible";
+	gebId("game-body").style.opacity = 1;
 	gebId("message").innerHTML = `Find <font color=red>${result.hider}</font>`;
+	Game.failed = 0;
 
 	Game.forHTML.writeTable(...(result.size), field);
 	document.onkeydown = onkeydown;
@@ -192,13 +198,12 @@ function startup() {
 		};
 
 		var shower = (result) => {
-			//
-			// var field = Game.makeField(result.size, result.hider, rands()); // TODO: 並列してグラフィック
 			var worker = new Worker("gamesystem.js");
-			worker.onmessage = function(event){
+			Game.level = result.size;
+			worker.onmessage = function (event) {
 				var field = event.data;
-				Game.starttime = new Date();
 				Game.fielddata = {field: field, hider: result.hider};
+				Game.starttime = new Date();
 				Game.forHTML.gamestart(result, field);
 			};
 
