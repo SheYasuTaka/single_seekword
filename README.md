@@ -4,9 +4,11 @@
 
 ### 稼働方法
 http-serverを同じディレクトリで走らせ、index.htmlを開く。  
-    npm install -g http-server  
-    cd (ディレクトリ)  
-    http-server  
+```bash
+    npm install -g http-server
+    cd (ディレクトリ)
+    http-server
+```
 
 ### 操作方法
 1. 1文字目のマスをクリック
