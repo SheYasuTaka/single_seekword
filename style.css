@@ -28,22 +28,6 @@ div {
 	display: block;
 }
 
-/*
-
-.page {
-	border-radius: 3px;
-	-webkit-box-orient: vertical;
-	transition: 200ms transform;
-	box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15);
-	color: #333;
-	min-width: 400px;
-	padding: 0;
-	position: relative;
-	z-index: 0;
-}
-
-*/
-
 .page {
 	border-radius: 3px;
 	-webkit-box-orient: vertical;
@@ -53,6 +37,7 @@ div {
 	color: #333;
 	width: 500px;
 	height: 400px;
+	max-height: 640px;
 	padding: 10px;
 	z-index: -1919;
 	position: absolute;
@@ -72,9 +57,12 @@ div {
 }
 
 #game-body {
-	opacity: 0;
 	text-align: center;
 	transition: opacity 500ms ease;
+}
+
+#game-body > :not(#message) {
+	opacity: 0;
 }
 
 #board th:hover {

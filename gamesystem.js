@@ -1,4 +1,4 @@
-var makeField = function (sides, t, seeds, hash) {
+var makeField = function (sides, t, seeds, hash, isworker) {
 	// The core function
 	"use strict";
 
@@ -546,7 +546,13 @@ var makeField = function (sides, t, seeds, hash) {
 			var cand = temporary_fields[0].cand[1];
 
 			// console.log(cand);
-			console.log(temporary_fields[0].quant);
+
+			if (isworker) postMessage({
+				mode: 'log',
+				result: temporary_fields[0].quant
+			});
+			else
+				console.log(temporary_fields[0].quant);
 
 			if (cand.length) {
 				// console.log("Line 516");
@@ -599,7 +605,9 @@ onmessage = function (event) {
 	"use strict";
 
 	var res = event.data;
-	postMessage(makeField(...res.args, eval(`(${res.hash})`)));
+	postMessage({
+		mode: 'result',
+		result: makeField(...res.args, eval(`(${res.hash})`), true)});
 };
 
 function f(...rest) {

@@ -136,7 +136,10 @@ Game.forHTML.gamestart = (result, field) => {
 	};
 
 	gebId("settings").style.opacity = 0;
-	gebId("game-body").style.opacity = 1;
+
+	console.log(gebId("game-body").children);
+
+	Array.prototype.slice.call(gebId("game-body").children).forEach((e) => e.style.opacity = 1);
 	gebId("message").innerHTML = `Find <font color=red>${result.hider}</font>`;
 	Game.failed = 0;
 
@@ -158,15 +161,17 @@ function startup() {
 				[24, 24]
 			];
 
-			var checktext = (text, boardsize) => {
+			var checktext = (text, lev) => {
 				if (!text) {
 					return "隠す文字列を入力して下さい";
 				} else if (text.split('').every((e) => (e === text[0]))) {
 					return "文字は2種類以上なければなりません";
-				} else if (boardsize && boardsize.every((e) => {
+				} else if (boardsizes[lev] && boardsizes[lev].every((e) => {
 					return e < text.length;
 				})) {
 					return "文字列が長すぎます";
+				} else if (lev >= 2 && text.length > 5) {
+					return "hardは5字以上の文字列に対応できていません";
 				} else {
 					return "";
 				}
@@ -188,7 +193,7 @@ function startup() {
 
 			var text = gebId("texttofind").value;
 
-			var isinvalid = checktext(text, boardsize);
+			var isinvalid = checktext(text, i);
 			if (isinvalid) errormess.push(isinvalid);
 
 			if (errormess.length) {
@@ -203,10 +208,18 @@ function startup() {
 			var worker = new Worker("gamesystem.js");
 			Game.level = result.size;
 			worker.onmessage = function (event) {
-				var field = event.data;
-				Game.fielddata = {field: field, hider: result.hider};
-				Game.starttime = new Date();
-				Game.forHTML.gamestart(result, field);
+				switch (event.data.mode) {
+				case 'result':
+					var field = event.data.result;
+					Game.fielddata = {field: field, hider: result.hider};
+					Game.starttime = new Date();
+					Game.forHTML.gamestart(result, field);
+					break;
+				
+				case 'log':
+					gebId("message").innerText = event.data.result;
+					break;
+				}
 			};
 
 			worker.postMessage(JSON.parse(JSON.stringify({
