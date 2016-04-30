@@ -197,6 +197,9 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 						var each_drtn = eachar[e];
 						each_drtn.forEach((e) => {
 							var holes = e[1];
+
+							// console.log(narrow_min);
+
 							if (holes < narrow_min) narrow_min = holes;
 						});
 					});
@@ -206,7 +209,10 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 					if (narrow_min < wide_min) wide_min = narrow_min;
 				});
 
-				// console.log(position, count);
+				// if (count < s - 1) {
+					// console.log(Object.keys(data).filter((e) => data[e]));
+					// console.log(position, count);
+				// }
 
 				if (count < 0) return true;
 
@@ -252,7 +258,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 					elem = axes(fld, position);
 
-					// console.log("l,", l, position, typeof elem);
+					// console.log("l,", l, position, typeof elem, holes, (typeof elem === 'string' ? elem : ''));
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[l] ||
@@ -262,7 +268,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 						l++;
 
 						break;
-					} else if (typeof holes !== 'string' && typeof elem !== 'string') {
+					} else if (holes !== 'Infinity' && typeof elem !== 'string') {
 						holes++;
 					}
 
@@ -275,7 +281,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 					elem = axes(fld, position);
 
-					// console.log("r,", r, position, typeof elem);
+					// console.log("r,", r, position, typeof elem, holes, (typeof elem === 'string' ? elem : ''));
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[r] ||
@@ -285,7 +291,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 						r--;
 
 						break;
-					} else if (typeof holes !== 'string' && typeof elem !== 'string') {
+					} else if (holes !== 'Infinity' && typeof elem !== 'string') {
 						holes++;
 					}
 
@@ -293,6 +299,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 				}
 
 				// console.log("lss", origin, holes);
+				// if (!holes) console.log(origin, where);
 				// console.log();
 
 				if (holes) {
@@ -318,12 +325,20 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 							result[char][key] = [];
 						}
 
+						// console.log(c, x);
+
 						result[char][key].push(x);
+
+						console.log(result[char][key].length);
+
 					}
 
 					return x;
 				});
+
 			});
+
+			// if (result) console.log(c, ...Object.keys(result).map(e => result[e] && Object.keys(result[e]).map(d => result[e][d])));
 
 			return result;
 		};
@@ -333,17 +348,27 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 				var positive = hash(drtn);
 				var negative = hash(drtn.map(e => -e));
 
+				// console.log(positive, negative);
+
 				Object.keys(ranges).forEach((can_be_taken) => {
 					var is_collapse;
 
-					if (!ranges[can_be_taken]) {
+					var status = ranges[can_be_taken];
+
+					if (!status) {
 						return;
 					}
 
-					is_collapse = Object.keys(ranges[can_be_taken][positive]).some((e) => {
+					is_collapse = Object.keys(status[positive]).some((e) => {
+
+						e = status[positive][e];
+
+						// console.log();
+
 						if (!isFinite(e[1])) return false;
 
 						if (t[e[0] - movements] !== char) {
+							// console.log("E-", e, char, e[0], movements);
 							e[1] = "Infinity";
 							return false;
 						}
@@ -352,36 +377,54 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 						if (e[1]) return false;
 
+						// console.log("Oops", diff, can_be_taken);
+
 						return true;
 					});
+
+					// if (status[positive].length > 1) console.log(status[positive]);
+
+					// console.log(is_collapse);
 
 					if (is_collapse) {
 						ranges[can_be_taken] = null;
 						return;
 					}
 
-					is_collapse = Object.keys(ranges[can_be_taken][negative]).some((e) => {
+					is_collapse = Object.keys(status[negative]).some((e) => {
+
+						e = status[negative][e];
+
+						// console.log(diff, can_be_taken, e[1]);
+
 						if (!isFinite(e[1])) return false;
 
 						if (t[e[0] + movements] !== char) {
+							// console.log("E+", e, char, e[0], movements);
 							e[1] = "Infinity";
 							return false;
 						}
 
 						e[1]--;
 
-						if (e[1]) {
-							return false;
-						}
+						if (e[1]) return false;
+
+						// console.log("Oops", diff, can_be_taken);
 
 						return true;
 					});
+
+					// if (status[negative].length > 1) console.log(status[negative]);
+
+					// console.log(is_collapse);
 
 					if (is_collapse) {
 						ranges[can_be_taken] = null;
 						return;
 					}
 				});
+
+				// console.log("?", diff, Object.keys(ranges).filter(e => ranges[e]));
 
 				return ranges;
 			};
@@ -395,7 +438,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 				while (++movements < s) {
 					changed = add_list(changed, drtn);
 
-					axes(f.field, changed, function (e) {
+					var lochars = axes(f.field, changed, function (e) {
 						switch(typeof e) {
 						case 'string':
 							return e;
@@ -406,12 +449,14 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 							return expand_range(e, diff, drtn, movements);
 						}
 					});
+					// console.log(...Object.keys(lochars).map((e)=>Object.keys(lochars[e]).map(d=>lochars[e][d])));
 				}
 			});
 
 			f.cand[1] = show_candidates(f.field, f.cand[0]);
 			f.quant--;
-			return temporary_fields[0] = f;
+			temporary_fields[0] = f;
+			return f.cand[1];
 		};
 
 		var wrap_first_map = function () {
@@ -456,14 +501,14 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 		var set_next_field = () => {
 			var reject_once = (arr, coor) => {
-				var inspector = x => x.every((elem, index) => elem === coor[index]);
+				var inspector = x => hash(x) === hash(coor);
 
 				return arr.some((e, i) => (inspector(e) && arr.splice(i,1)));
 			};
 
 			var seed = 1.0 - Math.sqrt(rand_with_seeds()[0]);
-			var selector = temporary_fields[0].cand[1];
-			var len = selector.length;
+			var iselector = temporary_fields[0].cand[1];
+			var len = iselector.length;
 
 			// console.log("Line 443");
 
@@ -471,7 +516,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 			for (;;) {
 				// console.log(selector[i][1], seed);
 
-				seed -= shuffle_rand(1 / selector[i][1], len + 1) * (len + 1);
+				seed -= shuffle_rand(1 / iselector[i][1], len + 1) * (len + 1);
 
 				// console.log("Line 451");
 
@@ -481,32 +526,32 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 				if (i === len) i = 0;
 			}
 
-			// console.log("sel:", selector[i]);
+			var isonly = !iselector[i][1];
 
 			seed = 1.0 - Math.sqrt(rand_with_seeds()[0]);
-			var dselector = selector[i][0];
+			var jselector = iselector[i][0];
 			var data;
-			len = dselector[1].length;
+			len = jselector[1].length;
 
-			i = 0;
+			var j = 0;
 
 			// console.log("Line 464")
 
 			for (;;) {
-				seed -= shuffle_rand(1 / dselector[1][i][1], len + 1) * (len + 1);
+				seed -= shuffle_rand(1 / jselector[1][j][1], len + 1) * (len + 1);
 
 				if (seed <= 0) break;
 
-				i++;
-				if (i === len) i = 0;
+				j++;
+				if (j === len) j = 0;
 			}
 
 			// console.log("Line 475");
 
-			// console.log("dsel:", dselector[1]);
+			// console.log("dsel:", jselector[1]);
 
-			data = [dselector[0].slice(), dselector[1].splice(i, 1)[0][0]];
-			if (!dselector.length) selector.splice(i, 1);
+			data = [jselector[0].slice(), jselector[1].splice(j, 1)[0][0]];
+			if (!jselector[1].length) iselector.splice(i, 1);
 
 			// console.log("data:", data);
 
@@ -519,10 +564,10 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 			reject_once(field.cand[0], data[0]);
 			axes(field.field, data[0], data[1]);
 
-			if (data[1]) {
-				temporary_fields.unshift(field);
-			} else {
+			if (isonly) {
 				temporary_fields[0] = field;
+			} else {
+				temporary_fields.unshift(field);
 			}
 
 			return data;
@@ -557,7 +602,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 			if (cand.length) {
 				// console.log("Line 516");
 				var data = set_next_field();
-				// console.log("Line 518");
+				// console.log(data);
 				var next = update_chars_data(data[0], data[1]);
 				// console.log("Line 520");
 				if (!next) {
@@ -622,6 +667,6 @@ function f(...rest) {
 }
 
 
-if (typeof deb !== 'undefined') {
+// if (typeof deb !== 'undefined') {
 	f([16, 16], "the", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
-}
+// }
