@@ -164,14 +164,14 @@ function startup() {
 			var checktext = (text, lev) => {
 				if (!text) {
 					return "隠す文字列を入力して下さい";
-				} else if (text.split('').every((e) => (e === text[0]))) {
+				} else if (text.split('').every(e => (e === text[0]))) {
 					return "文字は2種類以上なければなりません";
-				} else if (boardsizes[lev] && boardsizes[lev].every((e) => {
-					return e < text.length;
-				})) {
+				} else if (text.length <= 2) {
+					return "文字列が短すぎます";
+				} else if (boardsizes[lev] && boardsizes[lev].every(e => (e < text.length))) {
 					return "文字列が長すぎます";
 				} else if (lev >= 2 && text.length > 5) {
-					return "hardは5字以上の文字列に対応できていません";
+					return "hardは5字以上の文字列に対応できていません\nレベルか文字列を変えて再度お試しください";
 				} else {
 					return "";
 				}
