@@ -164,7 +164,7 @@ Game.forHTML.gamestart = (result, field) => {
 			Game.forHTML.timeup();
 		}
 	}, 1000);
-	console.log("intervalID", Game.forHTML.intervalID);
+	console.log(Game.cheet(Game.level, Game.fielddata.field, Game.coordinate_to_string, Game.fielddata.hider));
 };
 
 function startup() {
@@ -237,6 +237,7 @@ function startup() {
 					break;
 				
 				case 'log':
+					console.log("log:", event.data.result);
 					gebId("message").innerText = event.data.result;
 					gebId("progress").style.width = `${100 * (1 - event.data.result / (result.size[0][0] * result.size[0][1]))}%`;
 					break;
@@ -256,28 +257,37 @@ function startup() {
 	};
 }
 
-// TODO: コメントつけろ
-// TODO: オーダーおとせ
-
-// function view_result (sides, t) {
-// 	console.log("sides: ", sides, ", t: ", t);
-// 	console.time(   "view_result");
-//
-// 	var result = Game.makeField(sides, t, (":".repeat(16).split('').map(() => {
-// 		return Math.random();
-// 	})));
-//
-// 	console.timeEnd("view_result");
-// 	console.log(result.map(function (e){return e.join('')}).join('\n'));
-// }
-
-// view_result([16, 16], "flandre");
-// view_result([16, 16], "remilia");
-// view_result([ 8,  4], "scarlet");
-// view_result([ 7, 10], "onion";
-
-// view_result([ 8,  8], "escape"); // Accepted,   239.900ms
-// view_result([16, 16], "escape"); // Accepted,  3383.734ms
-// view_result([24, 24], "escape"); // Accepted, 14918.606ms
-
-// view_result([30, 30], "escape"); // Failed (too large object)
+Game.cheet = function (sides, field, hash, text) {
+	var choice = ((l)=>{var i=0,e=Math.pow(3,l),r=[];while(++i<e)r.push(((n)=>((s)=>('0'.repeat(l-s.length)+s))(n.toString(3)).split('').map((e)=>({'0': 0,'1': -1,'2': +1})[e]))(i));return r})(sides.length);
+	var answer = sides.map(()=>0);
+	var incf = () => {
+		var i = sides.length;
+		while (i--) {
+			if (++answer[i] < sides[i])
+				return;
+			else
+				answer[i] = 0;
+		}
+	};
+	var addL = (l,r)=>l.map((e,i)=>e+r[i]);
+	var correct = function (s, d) {
+		var i = 0;
+		var c = s.slice('');
+		while (++i < text.length) {
+			c = addL(c, d);
+			if (field[hash(c)] !== text[i])
+				return false;
+		}
+		return true;
+	};
+	console.log(choice.join(' '));
+	// return;
+	for (;;) {
+		console.log(answer, field[hash(answer)]);
+		if (field[hash(answer)] === text[0]) {
+			var res = choice.find(function (e) {if (correct(answer, e)) return [answer,e]});
+			if (res) return res;
+		}
+		incf("Doll judge");
+	}
+};

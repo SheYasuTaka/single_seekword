@@ -603,14 +603,17 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 		// loop
 		while (temporary_fields[0].quant) {
 
-			console.log("Line 606");
-			console.log(temporary_fields.map((e) => e.quant).join());
+			// console.log("Line 606");
+			// console.log(temporary_fields.map((e) => e.quant).join());
 
 			var cand = temporary_fields[0].cand[1];
 
 			// console.log(cand);
+			// 
+			console.log(isworker);
 
 			if (isworker) {
+				console.log("quant", temporary_fields[0].quant);
 				postMessage({
 					mode: 'log',
 					result: temporary_fields[0].quant
@@ -626,18 +629,20 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 				var data = set_next_field();
 				// console.log(data);
 				var next = update_chars_data(data[0], data[1]);
-				console.log("Line 627");
+				// console.log("Line 627");
 				if (!next) {
-					console.log("shit shift");
+					// console.log("shit shift");
 					temporary_fields.shift();
 				}
 			} else {
-				console.log("empt shift");
+				// console.log("empt shift");
 				temporary_fields.shift();
 			}
 			if (!temporary_fields.length) return null;
-			console.log("Line 636");
+			// console.log("Line 636");
 		}
+
+		// console.log("Line 642");
 
 		return temporary_fields[0].field;
 	};
@@ -712,5 +717,5 @@ function deb(x, rest, hash) {
 }
 
 // if (typeof deb !== 'undefined') {
-	f([16, 16], "this", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
+	// f([16, 16], "this", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
 // }
