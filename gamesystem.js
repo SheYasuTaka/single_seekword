@@ -9,16 +9,17 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 		var seed = seeds.shift();
 		var seed_to_use = seed * (range_size || (1 - seed) * 4);
 		var result = Math.floor(seed_to_use);
-		seeds.push(seed_to_use - result/* || 0.9*/);
+		seeds.push(seed_to_use - result || 0.9);
 		return [seed, result];
 	};
 
 	var shuffle_rand = function (seed, categories) {
-		// if (seeds[0]) console.log(seed, categories, seeds[0]);
+		// if (seeds[0]) console.log(seed, categories, seeds)
+		// if (!seed || !isFinite(seed)) console.log("shuf", seed, categories, seeds.join());
 		 
 		var data = rand_with_seeds(categories);
 		
-		var result = (data[1] + data[0]) / categories;
+		var result = ((seed * data[1] || seed) + data[0]) / categories;
 		
 		// console.log(result);
 
@@ -213,6 +214,8 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 					// console.log(Object.keys(data).filter((e) => data[e]));
 					// console.log(position, count);
 				// }
+				// 
+				// console.log(position, mins);
 
 				if (count < 0) return true;
 
@@ -222,6 +225,8 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 				var parameter = count * wide_min;
 				if (!parameter) parameter = 0;
+
+				// console.log(parameter);
 
 				// console.log(count, wide_min);
 				// console.log("param:", parameter);
@@ -237,6 +242,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 				lids.sort((a, b) => 
 					((a[0][1] - b[0][1]) || rand_with_seeds()[0] - 1/2)
 				);
+				// console.log(lids);
 				return lids;
 			}
 		};
@@ -259,6 +265,10 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 					elem = axes(fld, position);
 
 					// console.log("l,", l, position, typeof elem, holes, (typeof elem === 'string' ? elem : ''));
+					// console.log(!isexist(position),
+					//             typeof elem,
+					//             typeof elem === 'string' && elem !== splitext[l],
+					//             typeof elem === 'object' && !elem[splitext[l]]);
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[l] ||
@@ -282,6 +292,10 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 					elem = axes(fld, position);
 
 					// console.log("r,", r, position, typeof elem, holes, (typeof elem === 'string' ? elem : ''));
+					// console.log(!isexist(position),
+					//             typeof elem,
+					//             typeof elem === 'string' && elem !== splitext[l],
+					//             typeof elem === 'object' && !elem[splitext[l]]);
 
 					if (!isexist(position) ||
 						  typeof elem === 'string' && elem !== splitext[r] ||
@@ -329,7 +343,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 						result[char][key].push(x);
 
-						console.log(result[char][key].length);
+						// console.log(result[char][key].length);
 
 					}
 
@@ -367,7 +381,8 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 						if (!isFinite(e[1])) return false;
 
-						if (t[e[0] - movements] !== char) {
+						if (t[e[0] - movements] && t[e[0] - movements] !== char) {
+							// console.log("E-", e[0], movements, char, diff, drtn);
 							// console.log("E-", e, char, e[0], movements);
 							e[1] = "Infinity";
 							return false;
@@ -399,7 +414,8 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 						if (!isFinite(e[1])) return false;
 
-						if (t[e[0] + movements] !== char) {
+						if (t[e[0] + movements] && t[e[0] + movements] !== char) {
+							// console.log("E+", e[0], movements, char, diff, drtn);
 							// console.log("E+", e, char, e[0], movements);
 							e[1] = "Infinity";
 							return false;
@@ -431,6 +447,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 			var f = temporary_fields[0];
 
+			// console.log(diff);
 			choice.forEach((drtn) => {
 				var changed = diff.slice();
 				var movements = 0;
@@ -446,7 +463,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 							f.cand[0].push(changed);
 							return show_locatable_chars(changed);
 						case 'object':
-							return expand_range(e, diff, drtn, movements);
+							return expand_range(e, changed, drtn, movements);
 						}
 					});
 					// console.log(...Object.keys(lochars).map((e)=>Object.keys(lochars[e]).map(d=>lochars[e][d])));
@@ -514,7 +531,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 			var i = 0;
 			for (;;) {
-				// console.log(selector[i][1], seed);
+				// console.log(iselector[i][1], seed);
 
 				seed -= shuffle_rand(1 / iselector[i][1], len + 1) * (len + 1);
 
@@ -596,8 +613,10 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 				mode: 'log',
 				result: temporary_fields[0].quant
 			});
-			else
-				console.log(temporary_fields[0].quant);
+			else {
+				console.log(temporary_fields[0].quant, temporary_fields.length);
+				// deb(temporary_fields[0].field, sides, hash);
+			}
 
 			if (cand.length) {
 				// console.log("Line 516");
@@ -666,7 +685,27 @@ function f(...rest) {
 	}
 }
 
+function deb(x, rest, hash) {
+	for (var i = 0; i < rest[0]; i++) {
+		var s = '';
+		for (var j = 0; j < rest[1]; j++) {
+			var z = x[hash([i, j])];
+			switch (typeof z) {
+			case 'string':
+				s += z;
+				break;
+			case 'object':
+				s += '?';
+				break;
+			case 'undefined':
+				s += '.';
+				break;
+			}
+		}
+		console.log(s);
+	}
+}
 
 // if (typeof deb !== 'undefined') {
-	f([16, 16], "the", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
+	// f([16, 16], "the", '"'.repeat(16).split('').map(Math.random), (x)=>x.join(' '));
 // }
