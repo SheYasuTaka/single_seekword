@@ -112,9 +112,17 @@ div {
 	z-index: -114514;
 }
 
-
-
-
+#progress {
+	background-color: #FF840A;
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 3px;
+	margin-right: auto;
+	z-index: 114514;
+	width: 0%;
+	transition: width 100ms ease;
+}
 
 
 

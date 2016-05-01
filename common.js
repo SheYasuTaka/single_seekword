@@ -25,7 +25,7 @@ Game.forHTML.showResult = (timeMS) => {
 	document.onkeydown= null;
 	gebId("game-body").style.opacity = 1/8;
 	gebId("game-result").style.opacity = 1;
-	gebId("result-level").innerText = Game.level.join('x');
+	gebId("result-level").innerText = `${Game.levelname} (${Game.level.join('x')})`;
 	gebId("result-timer").innerText = timeMS / 1000;
 	gebId("result-mistakes").innerText = Game.failed;
 };
@@ -148,15 +148,16 @@ Game.forHTML.gamestart = (result, field) => {
 		Game.forHTML.taped = [h, w];
 	};
 
+	gebId("progress").style.width = 0;
 	gebId("settings").style.opacity = 0;
 	Array.prototype.slice.call(gebId("game-body").children).forEach((e) => e.style.opacity = 1);
 	gebId("message").innerHTML = `Find <font color=red>${result.hider}</font>`;
 	Game.failed = 0;
 
-	Game.forHTML.writeTable(...(result.size), field);
+	Game.forHTML.writeTable(...(result.size[0]), field);
 	document.onkeydown = onkeydown;
 	Game.forHTML.taptile = taptile;
-	Game.forHTML.timelim = [114, 514].fill(Game.forHTML.setTimeLimit(...result.size));
+	Game.forHTML.timelim = [114, 514].fill(Game.forHTML.setTimeLimit(...result.size[0]));
 	Game.forHTML.intervalID = setInterval(function (){
 		gebId("timelim").innerText = --Game.forHTML.timelim[0];
 		if (!Game.forHTML.timelim[0]) {
@@ -174,19 +175,19 @@ function startup() {
 
 		var checker = () => {
 			var boardsizes = [
-				[ 8,  8],
-				[16, 16],
-				[24, 24]
+				[[ 8,  8], "easy"],
+				[[16, 16], "normal"],
+				[[24, 24], "hard"]
 			];
 
 			var checktext = (text, lev) => {
 				if (!text) {
 					return "隠す文字列を入力して下さい";
-				} else if (text.split('').every(e => (e === text[0]))) {
-					return "文字は2種類以上なければなりません";
 				} else if (text.length <= 2) {
 					return "文字列が短すぎます";
-				} else if (boardsizes[lev] && boardsizes[lev].every(e => (e < text.length))) {
+				} else if (text.split('').every(e => (e === text[0]))) {
+					return "文字は2種類以上なければなりません";
+				} else if (boardsizes[lev][0] && boardsizes[lev][0].every(e => (e < text.length))) {
 					return "文字列が長すぎます";
 				} else if (lev >= 2 && text.length > 5) {
 					return "hardは5字以上の文字列に対応できていません\nレベルか文字列を変えて再度お試しください";
@@ -224,7 +225,8 @@ function startup() {
 
 		var shower = (result) => {
 			var worker = new Worker("gamesystem.js");
-			Game.level = result.size;
+			Game.level = result.size[0];
+			Game.levelname = result.size[1];
 			worker.onmessage = function (event) {
 				switch (event.data.mode) {
 				case 'result':
@@ -236,12 +238,13 @@ function startup() {
 				
 				case 'log':
 					gebId("message").innerText = event.data.result;
+					gebId("progress").style.width = `${100 * (1 - event.data.result / (result.size[0][0] * result.size[0][1]))}%`;
 					break;
 				}
 			};
 
 			worker.postMessage(JSON.parse(JSON.stringify({
-				args: [result.size, result.hider, rands()],
+				args: [result.size[0], result.hider, rands()],
 				hash: Game.coordinate_to_string.toString(10)
 			})));
 			// TODO: ゲーム本体
