@@ -16,25 +16,38 @@ Game.forHTML = {};
 
 Game.forHTML.taped = null;
 
-Game.forHTML.succeed = (orig, vect) => {
-	var clearEffect = (orig, vect, timeMS) => {
-		var n = Game.fielddata.hider.split('').length;
-		while (n--) {
-			gebId("board").rows[orig[0]].cells[orig[1]].classList.add('correct');
-			orig = orig.map((e, i) => (e + vect[i]));
-		}
-		gebId("game-body").style.opacity = 1/8;
-		gebId("game-result").style.opacity = 1;
-		gebId("result-level").innerText = Game.level.join('x');
-		gebId("result-timer").innerText = timeMS / 1000;
-		gebId("result-mistakes").innerText = Game.failed;
-	};
+Game.forHTML.setTimeLimit = (h, w) => {
+	return Math.floor(h * w / 4);
+};
 
+Game.forHTML.showResult = (timeMS) => {
+	clearInterval(Game.forHTML.intervalID);
+	document.onkeydown= null;
+	gebId("game-body").style.opacity = 1/8;
+	gebId("game-result").style.opacity = 1;
+	gebId("result-level").innerText = Game.level.join('x');
+	gebId("result-timer").innerText = timeMS / 1000;
+	gebId("result-mistakes").innerText = Game.failed;
+};
+
+Game.forHTML.clearEffect = (orig, vect) => {
+	var n = Game.fielddata.hider.split('').length;
+	while (n--) {
+		gebId("board").rows[orig[0]].cells[orig[1]].classList.add('correct');
+		orig = orig.map((e, i) => (e + vect[i]));
+	}
+};
+
+Game.forHTML.timeup = () => {
+	gebId("board").classList.add('timeup');
+	Game.forHTML.showResult(Game.forHTML.timelim[1] * 1000);
+};
+
+Game.forHTML.succeed = (orig, vect) => {
 	var resulttimeMS = (new Date() - Game.starttime);
 
-	document.onkeydown = null;
-
-	clearEffect(orig, vect, resulttimeMS);
+	Game.forHTML.clearEffect(orig, vect);
+	Game.forHTML.showResult(resulttimeMS);
 };
 
 Game.forHTML.fail = () => {
@@ -136,9 +149,6 @@ Game.forHTML.gamestart = (result, field) => {
 	};
 
 	gebId("settings").style.opacity = 0;
-
-	console.log(gebId("game-body").children);
-
 	Array.prototype.slice.call(gebId("game-body").children).forEach((e) => e.style.opacity = 1);
 	gebId("message").innerHTML = `Find <font color=red>${result.hider}</font>`;
 	Game.failed = 0;
@@ -146,6 +156,14 @@ Game.forHTML.gamestart = (result, field) => {
 	Game.forHTML.writeTable(...(result.size), field);
 	document.onkeydown = onkeydown;
 	Game.forHTML.taptile = taptile;
+	Game.forHTML.timelim = [114, 514].fill(Game.forHTML.setTimeLimit(...result.size));
+	Game.forHTML.intervalID = setInterval(function (){
+		gebId("timelim").innerText = --Game.forHTML.timelim[0];
+		if (!Game.forHTML.timelim[0]) {
+			Game.forHTML.timeup();
+		}
+	}, 1000);
+	console.log("intervalID", Game.forHTML.intervalID);
 };
 
 function startup() {

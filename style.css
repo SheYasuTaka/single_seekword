@@ -85,12 +85,17 @@ div {
 	font-size: 20px;
 	width: 24px;
 	height: 24px;
+	transition: background-color 250ms ease;
 }
 
 #board.failed th:not(.selected) {
 	animation-name: scarlet-flash;
 	animation-duration: 500ms;
 	animation-timing-function: ease;
+}
+
+#board.timeup th {
+	background-color: #DE3838;
 }
 
 @keyframes scarlet-flash {
