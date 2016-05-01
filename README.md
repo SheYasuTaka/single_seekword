@@ -5,9 +5,9 @@
 ### 稼働方法
 http-serverを同じディレクトリで走らせ、表示されたポートにアクセスする。  
 ```bash
-    npm install -g http-server
-    cd (ディレクトリ)
-    http-server
+npm install -g http-server
+cd (ディレクトリ)
+http-server
 ```
 
 ### 操作方法
