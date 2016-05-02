@@ -22,8 +22,9 @@ Game.forHTML.setTimeLimit = (h, w) => {
 };
 
 Game.forHTML.showResult = (timeMS) => {
+	Game.forHTML.taptile = null;
 	clearInterval(Game.forHTML.intervalID);
-	document.onkeydown= null;
+	document.onkeydown = null;
 	gebId("game-body").style.opacity = /*1/8*/ 1/6;
 	gebId("game-result").style.opacity = 1;
 	gebId("result-level").innerText = `${Game.levelname} (${Game.level.join('x')})`;
@@ -148,7 +149,10 @@ Game.forHTML.gamestart = (result, field) => {
 	};
 
 	var taptile = (h, w) => {
+		var oldtaped = Game.forHTML.taped;
+		if (oldtaped) gebId("board").rows[oldtaped[0]].cells[oldtaped[1]].classList.remove('selected');
 		Game.forHTML.taped = [h, w];
+		gebId("board").rows[h].cells[w].classList.add('selected');
 	};
 
 	gebId("progress").style.width = 0;
