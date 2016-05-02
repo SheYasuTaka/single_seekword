@@ -94,7 +94,7 @@ div {
 	animation-timing-function: ease;
 }
 
-#board.timeup th {
+#board.timeup th:not(.correct) {
 	background-color: #DE3838;
 }
 
@@ -124,7 +124,9 @@ div {
 	transition: width 100ms ease;
 }
 
-
+.target {
+	color: red;
+}
 
 
 

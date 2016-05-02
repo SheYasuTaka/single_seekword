@@ -1,8 +1,9 @@
 "use strict";
 
 var Game = {};
-var gebId    = document.getElementById.bind(document),
-    gesbName = document.getElementsByName.bind(document);
+var gebId     = document.getElementById.bind(document),
+    gesbName  = document.getElementsByName.bind(document),
+    gesbClass = document.getElementsByClassName.bind(document);
 
 var taptile = (...rest) => {
 	(Game.forHTML.taptile || (()=>{}))(...rest);
@@ -23,7 +24,7 @@ Game.forHTML.setTimeLimit = (h, w) => {
 Game.forHTML.showResult = (timeMS) => {
 	clearInterval(Game.forHTML.intervalID);
 	document.onkeydown= null;
-	gebId("game-body").style.opacity = 1/8;
+	gebId("game-body").style.opacity = /*1/8*/ 1/6;
 	gebId("game-result").style.opacity = 1;
 	gebId("result-level").innerText = `${Game.levelname} (${Game.level.join('x')})`;
 	gebId("result-timer").innerText = timeMS / 1000;
@@ -40,6 +41,8 @@ Game.forHTML.clearEffect = (orig, vect) => {
 
 Game.forHTML.timeup = () => {
 	gebId("board").classList.add('timeup');
+	var answer = Game.cheet(Game.level, Game.fielddata.field, Game.coordinate_to_string, Game.fielddata.hider);
+	Game.forHTML.clearEffect(...answer);
 	Game.forHTML.showResult(Game.forHTML.timelim[1] * 1000);
 };
 
@@ -151,7 +154,8 @@ Game.forHTML.gamestart = (result, field) => {
 	gebId("progress").style.width = 0;
 	gebId("settings").style.opacity = 0;
 	Array.prototype.slice.call(gebId("game-body").children).forEach((e) => e.style.opacity = 1);
-	gebId("message").innerHTML = `Find <font color=red>${result.hider}</font>`;
+	gebId("message").innerHTML = `Find <span class="target"></span><br>マスをクリックで1文字目を選択、[QWEDCXZA](Sの周囲8キー)で方向を選択`;
+	gesbClass("target")[0].innerText = result.hider;
 	Game.failed = 0;
 
 	Game.forHTML.writeTable(...(result.size[0]), field);
@@ -164,7 +168,6 @@ Game.forHTML.gamestart = (result, field) => {
 			Game.forHTML.timeup();
 		}
 	}, 1000);
-	console.log(Game.cheet(Game.level, Game.fielddata.field, Game.coordinate_to_string, Game.fielddata.hider));
 };
 
 function startup() {
@@ -187,7 +190,7 @@ function startup() {
 					return "文字列が短すぎます";
 				} else if (text.split('').every(e => (e === text[0]))) {
 					return "文字は2種類以上なければなりません";
-				} else if (boardsizes[lev][0] && boardsizes[lev][0].every(e => (e < text.length))) {
+				} else if (boardsizes[lev] && boardsizes[lev][0].every(e => (e < text.length))) {
 					return "文字列が長すぎます";
 				} else if (lev >= 2 && text.length > 5) {
 					return "hardは5字以上の文字列に対応できていません\nレベルか文字列を変えて再度お試しください";
@@ -216,6 +219,7 @@ function startup() {
 			if (isinvalid) errormess.push(isinvalid);
 
 			if (errormess.length) {
+				console.log(errormess.join('\n'));
 				alert(errormess.join('\n'));
 				return null;
 			} else {
@@ -286,7 +290,7 @@ Game.cheet = function (sides, field, hash, text) {
 		console.log(answer, field[hash(answer)]);
 		if (field[hash(answer)] === text[0]) {
 			var res = choice.find(function (e) {if (correct(answer, e)) return [answer,e]});
-			if (res) return res;
+			if (res) return [answer, res];
 		}
 		incf("Doll judge");
 	}
