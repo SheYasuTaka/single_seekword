@@ -38,6 +38,7 @@ Game.forHTML.clearEffect = (orig, vect) => {
 		gebId("board").rows[orig[0]].cells[orig[1]].classList.add('correct');
 		orig = orig.map((e, i) => (e + vect[i]));
 	}
+	gebId("board").classList.add('gameset');
 };
 
 Game.forHTML.timeup = () => {
@@ -232,6 +233,7 @@ function startup() {
 		};
 
 		var shower = (result) => {
+			gebId("settings-confirm").onclick = null;
 			var worker = new Worker("gamesystem.js");
 			Game.level = result.size[0];
 			Game.levelname = result.size[1];

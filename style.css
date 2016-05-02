@@ -65,7 +65,7 @@ div {
 	opacity: 0;
 }
 
-#board th:hover {
+#board:not(.gameset) th:hover {
 	background-color: #A1CBED;
 }
 
