@@ -224,7 +224,7 @@ function startup() {
 			if (isinvalid) errormess.push(isinvalid);
 
 			if (errormess.length) {
-				console.log(errormess.join('\n'));
+				// console.log(errormess.join('\n'));
 				alert(errormess.join('\n'));
 				return null;
 			} else {
@@ -247,7 +247,7 @@ function startup() {
 					break;
 				
 				case 'log':
-					console.log("log:", event.data.result);
+					// console.log("log:", event.data.result);
 					gebId("message").innerText = event.data.result;
 					gebId("progress").style.width = `${100 * (1 - event.data.result / (result.size[0][0] * result.size[0][1]))}%`;
 					break;

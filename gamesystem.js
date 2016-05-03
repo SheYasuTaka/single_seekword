@@ -531,9 +531,9 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 			var i = 0;
 			for (;;) {
-				console.log(iselector[i][1], seed);
+				// console.log(iselector[i][1], seed);
 
-				seed -= shuffle_rand(1 / iselector[i][1], len + 1) * (len + 1);
+				seed -= shuffle_rand(1 / iselector[i][1], len | 1);
 
 				// console.log("Line 451");
 
@@ -555,7 +555,7 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 			// console.log("Line 464")
 
 			for (;;) {
-				seed -= shuffle_rand(1 / jselector[1][j][1], len + 1) * (len + 1);
+				seed -= shuffle_rand(1 / jselector[1][j][1], len | 1);
 
 				if (seed <= 0) break;
 
@@ -605,15 +605,17 @@ var makeField = function (sides, t, seeds, hash, isworker) {
 
 			// console.log("Line 606");
 			// console.log(temporary_fields.map((e) => e.quant).join());
+			// 
+			console.log("candlen", temporary_fields[0].quant, temporary_fields[0].cand[1].length);
 
 			var cand = temporary_fields[0].cand[1];
 
 			// console.log(cand);
 			// 
-			console.log(isworker);
+			// console.log(isworker);
 
 			if (isworker) {
-				console.log("quant", temporary_fields[0].quant);
+				// console.log("quant", temporary_fields[0].quant);
 				postMessage({
 					mode: 'log',
 					result: temporary_fields[0].quant
